@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Velora Admin Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #fff
+        }
+
+        header {
+            padding: 20px;
+            background: #181818;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .container {
+            padding: 20px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #aaa
+        }
+
+        .card h1 {
+            color: #1DB954;
+            margin: 10px 0 0
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e1e1e;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            text-align: left
+        }
+
+        th {
+            background: #232323
+        }
+
+        img.cover {
+            width: 42px;
+            height: 42px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px
+        }
+
+        .section {
+            margin-top: 25px
+        }
+
+        .back {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #282828;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background .2s;
+        }
+
+        .back:hover {
+            background: #1DB954;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h2>📊 Velora Admin Dashboard</h2>
+
+
+        <button class="back" onclick="loadDashboard()">
+            🔄 Refresh
+        </button>
+
+        <div class="nav">
+
+            <a href="/" class="back">
+                🏠 Home
+            </a>
+
+
+        </div>
+    </header>
+    <div class="container">
+        <div class="grid">
+            <div class="card">
+                <h3>Users</h3>
+                <h1 id="users">0</h1>
+            </div>
+            <div class="card">
+                <h3>Songs</h3>
+                <h1 id="songs">0</h1>
+            </div>
+            <div class="card">
+                <h3>Downloads</h3>
+                <h1 id="downloads">0</h1>
+            </div>
+            <div class="card">
+                <h3>Plays</h3>
+                <h1 id="plays">0</h1>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Top Plays</h2>
+            <table id="topPlays"></table>
+        </div>
+
+        <div class="section">
+            <h2>Recent Downloads</h2>
+            <table id="downloadsTable"></table>
+        </div>
+        <div class="section">
+            <h2>Recent Plays</h2>
+            <table id="playsTable"></table>
+        </div>
+        <div class="section">
+            <h2>Top Downloads</h2>
+            <table id="topDownloads"></table>
+        </div>
+
+    </div>
+    <script>
+        const token = localStorage.getItem("token");
+        async function loadDashboard() {
+            const r = await fetch("/admin/dashboard", { headers: { Authorization: "Bearer " + token } });
+            const d = await r.json();
+            console.log(d);
+            users.textContent = d.overview.users;
+            songs.textContent = d.overview.songs;
+            downloads.textContent = d.overview.downloads;
+            plays.textContent = d.overview.plays;
+            downloadsTable.innerHTML = "<tr><th>User</th><th>Song</th><th>Playlist</th><th>Time</th></tr>" + d.recent_downloads.map(x => `<tr><td>${x.username}</td><td><img class='cover' src='/media/${x.youtube_id}.jpg' onerror="this.style.display='none'">${x.title}</td><td>${x.playlist ?? "-"}</td><td>${new Date(x.downloaded_at).toLocaleString()}</td></tr>`).join("");
+            playsTable.innerHTML = "<tr><th>User</th><th>Song</th><th>Time</th></tr>" + d.recent_plays.map(x => `<tr><td>${x.username}</td><td><img class='cover' src='/media/${x.youtube_id}.jpg' onerror="this.style.display='none'">${x.title}</td><td>${new Date(x.played_at).toLocaleString()}</td></tr>`).join("");
+            topDownloads.innerHTML = "<tr><th>Song</th><th>Count</th></tr>" + d.top_downloads.map(x => `<tr><td>${x.title}</td><td>${x.count}</td></tr>`).join("");
+            topPlays.innerHTML = "<tr><th>Song</th><th>Count</th></tr>" + d.top_plays.map(x => `<tr><td>${x.title}</td><td>${x.count}</td></tr>`).join("");
+        }
+        loadDashboard();
+        setInterval(loadDashboard, 30000);
+    </script>
+</body>
+
+</html>

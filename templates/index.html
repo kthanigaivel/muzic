@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Velora</title>
+<link rel="icon" type="image/x-icon" href="/static/images/music.png">
+
+<link rel="stylesheet" href="/static/css/index.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <div class="logo">
+                🎵 Velora
+            </div>
+
+            <div class="menu-item" onclick="loadSongs()">
+                🏠 Home
+            </div>
+
+            <div class="menu-item" onclick="showFavorites()">
+                ❤️ Favorites
+            </div>
+
+        </div>
+
+        <div class="main">
+
+            <div class="hero">
+
+                <div class="hero-top">
+
+                    <div>
+                        <h1 id="greeting"></h1>
+                        <p>Welcome back to Velora</p>
+                    </div>
+
+                    <div class="profile" onclick="toggleProfile()">
+
+                        <img id="profile-image" src="/static/images/default-cover.jpg" alt="Profile">
+
+                        <span id="profile-name"></span>
+
+                        ▼
+
+                        <div id="profile-menu" class="profile-menu">
+
+                            <a href="/user/default">
+                                👤 Profile
+                            </a>
+
+                            <a href="/user/download">
+                                ⬆ Import Songs
+                            </a>
+
+                            <a href="/dash">
+                                📊 Dashboard
+                            </a>
+
+                            <a href="#" onclick="logout();return false;">
+                                🚪 Logout
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <input id="search" class="search" placeholder="Search songs..." onkeyup="filterSongs()">
+
+            <div id="songs" class="song-grid">
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="player">
+
+        <div class="player-left">
+
+            <img id="current-cover" src="/static/images/default-cover.jpg">
+
+            <div>
+
+                <div id="song-name" class="song-name">
+
+                    Welcome to Velora
+
+                </div>
+
+                <div id="artist-name" class="artist-name">
+
+                    Select a song
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="player-center">
+
+            <div class="controls">
+
+                <button onclick="prevSong()">
+                    ⏮
+                </button>
+
+                <button id="playBtn" onclick="togglePlay()">
+
+                    ▶
+
+                </button>
+
+                <button onclick="nextSong()">
+                    ⏭
+                </button>
+
+                <button onclick="randomSong()">
+                    🔀
+                </button>
+
+
+                <button id="playerFavorite" onclick="toggleCurrentFavorite()">
+                    🤍
+                </button>
+
+            </div>
+
+            <audio id="player" controls>
+            </audio>
+
+        </div>
+
+    </div>
+
+    <script src="/static/js/index.js?v=2"></script>
+
+</body>
+
+</html>
