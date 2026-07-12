@@ -29,6 +29,11 @@ def dashboard(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized to access this resource",
+        )    
 
     total_users = db.query(func.count(User.id)).scalar()
 
@@ -67,25 +72,7 @@ def dashboard(
         .limit(20)
         .all()
     )
-    top_downloads = (
-        db.query(
-            Song.filename,
-            Song.youtube_id,
-            func.count(DownloadHistory.id).label("count"),
-        )
-        .join(
-            DownloadHistory,
-            Song.youtube_id == DownloadHistory.youtube_id,
-        )
-        .group_by(
-            Song.youtube_id,
-            Song.filename,
-        )
-        .order_by(func.count(DownloadHistory.id).desc())
-        .limit(10)
-        .all()
-    )
-
+ 
     top_plays = (
         db.query(
             Song.filename,
@@ -133,15 +120,6 @@ def dashboard(
                 "played_at": history.played_at,
             }
             for history, username, filename in recent_plays
-        ],
-
-        "top_downloads": [
-            {
-                "youtube_id": x.youtube_id,
-                "title": x.filename,
-                "count": x.count,
-            }
-            for x in top_downloads
         ],
 
         "top_plays": [

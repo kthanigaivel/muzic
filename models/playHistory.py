@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app.models.user import User
 from sqlalchemy import String, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -17,14 +18,19 @@ class PlayHistory(Base):
     )
 
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey("users.id",ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
+    
+    user: Mapped["User"] = relationship(
+        back_populates="play_history"
+    )
+    
 
     youtube_id: Mapped[str] = mapped_column(
         String(20),
-        ForeignKey("songs.youtube_id"),
+        ForeignKey("songs.youtube_id",ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

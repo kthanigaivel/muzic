@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 
 
@@ -18,7 +18,9 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     
-
+class UserDelete(BaseModel):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
 class Token(BaseModel):
     access_token: str
     token_type: str

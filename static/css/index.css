@@ -34,6 +34,8 @@
      color: #b3b3b3;
      cursor: pointer;
      font-size: 15px;
+     display: block;
+     text-decoration: none;
  }
 
  .menu-item:hover {
@@ -366,29 +368,6 @@ audio{
      width: 42px;
      height: 42px;
      border-radius: 50%;
- }
-
- .profile-menu {
-
-     position: absolute;
-
-     right: 0;
-
-     top: 58px;
-
-     width: 220px;
-
-     background: #181818;
-
-     border: 1px solid #333;
-
-     border-radius: 12px;
-
-     display: none;
-
-     overflow: hidden;
-
-     z-index: 999;
  }
 
  .profile-menu {

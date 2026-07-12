@@ -2,15 +2,22 @@
 <html lang="en">
 
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Velora admin dashboard for user, song, download, and play analytics.">
     <title>Velora Admin Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/music.png">
+
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #121212;
-            color: #fff
+            color: #fff;
         }
 
         header {
@@ -18,11 +25,24 @@
             background: #181818;
             display: flex;
             justify-content: space-between;
-            align-items: center
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .container {
-            padding: 20px
+            padding: 20px;
         }
 
         .grid {
@@ -100,19 +120,16 @@
 <body>
     <header>
         <h2>📊 Velora Admin Dashboard</h2>
-
-
-        <button class="back" onclick="loadDashboard()">
-            🔄 Refresh
-        </button>
-
-        <div class="nav">
-
+        <div class="header-actions">
+            <button class="back" onclick="loadDashboard()">
+                🔄 Refresh
+            </button>
+            <button class="back" onclick="cleanupDownloads()">
+                🧹 Clean Downloads
+            </button>
             <a href="/" class="back">
                 🏠 Home
             </a>
-
-
         </div>
     </header>
     <div class="container">
@@ -148,30 +165,152 @@
             <h2>Recent Plays</h2>
             <table id="playsTable"></table>
         </div>
-        <div class="section">
-            <h2>Top Downloads</h2>
-            <table id="topDownloads"></table>
-        </div>
+
 
     </div>
     <script>
         const token = localStorage.getItem("token");
+        const usersEl = document.getElementById("users");
+        const songsEl = document.getElementById("songs");
+        const downloadsEl = document.getElementById("downloads");
+        const playsEl = document.getElementById("plays");
+        const downloadsTableEl = document.getElementById("downloadsTable");
+        const playsTableEl = document.getElementById("playsTable");
+        const topPlaysEl = document.getElementById("topPlays");
+
         async function loadDashboard() {
-            const r = await fetch("/admin/dashboard", { headers: { Authorization: "Bearer " + token } });
-            const d = await r.json();
-            console.log(d);
-            users.textContent = d.overview.users;
-            songs.textContent = d.overview.songs;
-            downloads.textContent = d.overview.downloads;
-            plays.textContent = d.overview.plays;
-            downloadsTable.innerHTML = "<tr><th>User</th><th>Song</th><th>Playlist</th><th>Time</th></tr>" + d.recent_downloads.map(x => `<tr><td>${x.username}</td><td><img class='cover' src='/media/${x.youtube_id}.jpg' onerror="this.style.display='none'">${x.title}</td><td>${x.playlist ?? "-"}</td><td>${new Date(x.downloaded_at).toLocaleString()}</td></tr>`).join("");
-            playsTable.innerHTML = "<tr><th>User</th><th>Song</th><th>Time</th></tr>" + d.recent_plays.map(x => `<tr><td>${x.username}</td><td><img class='cover' src='/media/${x.youtube_id}.jpg' onerror="this.style.display='none'">${x.title}</td><td>${new Date(x.played_at).toLocaleString()}</td></tr>`).join("");
-            topDownloads.innerHTML = "<tr><th>Song</th><th>Count</th></tr>" + d.top_downloads.map(x => `<tr><td>${x.title}</td><td>${x.count}</td></tr>`).join("");
-            topPlays.innerHTML = "<tr><th>Song</th><th>Count</th></tr>" + d.top_plays.map(x => `<tr><td>${x.title}</td><td>${x.count}</td></tr>`).join("");
+            if (!token) {
+                console.error("Dashboard load failed: missing auth token.");
+                return;
+            }
+
+            try {
+                const r = await fetch("/admin/dashboard", {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!r.ok) {
+                    console.error("Dashboard load failed:", r.status, r.statusText);
+                    return;
+                }
+
+                const d = await r.json();
+
+                usersEl.textContent = d.overview.users;
+                songsEl.textContent = d.overview.songs;
+                downloadsEl.textContent = d.overview.downloads;
+                playsEl.textContent = d.overview.plays;
+
+                downloadsTableEl.innerHTML = "<tr><th>User</th><th>Song</th><th>Playlist</th><th>Time</th></tr>" +
+                    d.recent_downloads.map(x => `
+                        <tr>
+                            <td>${x.username}</td>
+                            <td><img class='cover' src='/media/${x.youtube_id}.jpg' onerror="this.style.display='none'">${x.title} <button onclick="playSong('${x.youtube_id}')">▶ Play</button></td>
+                            <td>${x.playlist ?? "-"}</td>
+                            <td>${new Date(x.downloaded_at).toLocaleString()}</td>
+                        </tr>
+                    `).join("");
+
+                playsTableEl.innerHTML = "<tr><th>User</th><th>Song</th><th>Time</th></tr>" +
+                    d.recent_plays.map(x => `
+                        <tr>
+                            <td>${x.username}</td>
+                            <td><img class='cover' src='/media/${x.youtube_id}.jpg' onerror="this.style.display='none'">${x.title}</td>
+                            <td>${new Date(x.played_at).toLocaleString()}</td>
+                        </tr>
+                    `).join("");
+
+                topPlaysEl.innerHTML = "<tr><th>Song</th><th>Count</th></tr>" +
+                    d.top_plays.map(x =>
+                        `<tr>
+                    <td>${x.title}
+                    </td>
+                    <td>${x.count}
+                    <td>
+                        <button onclick="playSong('${x.youtube_id}')">▶ Play</button>
+           
+                    </td>
+                    </tr>`).join("");
+            } catch (error) {
+                console.error("Dashboard load failed:", error);
+            }
         }
+
+        async function playSong(youtubeId) {
+            // Record play in backend (non-blocking for playback)
+            try {
+                const response = await fetch(
+                    `/songs/play?youtube_id=${encodeURIComponent(youtubeId)}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    console.warn("Failed to record play:", await response.text());
+                }
+            } catch (err) {
+                console.error("Record play error:", err);
+            }
+
+            // Play inline on the dashboard
+            try {
+                const dashPlayer = document.getElementById("dashboardPlayer");
+                if (!dashPlayer) {
+                    console.error("Dashboard player element missing.");
+                    return;
+                }
+                dashPlayer.src = `/media/${youtubeId}.mp3`;
+                dashPlayer.play().catch(e => console.error("Playback failed:", e));
+            } catch (err) {
+                console.error("Player error:", err);
+            }
+        }
+
         loadDashboard();
         setInterval(loadDashboard, 30000);
+
+        async function cleanupDownloads() {
+            if (!token) {
+                alert('Missing auth token. Please login as admin.');
+                return;
+            }
+
+            if (!confirm('Run cleanup of orphaned downloads? This will permanently delete files.')) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/admin/cleanup/downloads', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    const txt = await res.text();
+                    alert('Cleanup failed: ' + res.status + ' ' + txt);
+                    return;
+                }
+
+                const data = await res.json();
+                alert(`Cleanup complete. Kept: ${data.kept}, Deleted: ${data.deleted}`);
+                loadDashboard();
+            } catch (err) {
+                console.error('Cleanup error', err);
+                alert('Cleanup failed: ' + err.message);
+            }
+        }
     </script>
+    <audio id="dashboardPlayer" controls style="width:100%;position:fixed;bottom:0;left:0;background:#181818;color:#fff;padding:8px;z-index:9999;"></audio>
 </body>
 
 </html>

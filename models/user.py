@@ -51,4 +51,11 @@ class User(Base):
         cascade="all, delete-orphan",
     )
     
+    play_history: Mapped[list["PlayHistory"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    
+    role: Mapped[str] = mapped_column(String(20), default="user")
 

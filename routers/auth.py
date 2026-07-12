@@ -1,3 +1,4 @@
+from app.models.playHistory import PlayHistory
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -54,6 +55,9 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
 
     return new_user
 
+@router.get("/list", response_model=list[UserResponse])
+def list_users(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    return db.query(User).all()
 
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
@@ -96,6 +100,22 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         },
     }
     
+@router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if current_user.id != user_id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to delete this user")   
+    
+    session=db.query(PlayHistory).filter(PlayHistory.user_id==user_id).delete()
+    session=db.query(User).filter(User.id==user_id).delete()
+    
+    db.commit()
+
+
+    return {"detail": "User deleted successfully"}
 
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):

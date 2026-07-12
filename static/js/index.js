@@ -1,12 +1,28 @@
 const token = localStorage.getItem("token");
 
 if (!token) {
-    window.location.href = "/user/default";
+    window.location.href = "/default";
+}
+
+function getToken() {
+    return localStorage.getItem("token");
+}
+
+function getAuthHeaders() {
+    const token = getToken();
+    if (!token) {
+        logout();
+        return null;
+    }
+    return {
+        "Authorization": `Bearer ${token}`
+    };
 }
 
 let songs = [];
 let filteredSongs = [];
 let favorites = new Set();
+let currentUser = null;
 
 let currentSong = null;
 let currentIndex = -1;
@@ -32,13 +48,14 @@ async function loadCurrentUser() {
 
     try {
 
-        const response = await fetch("/auth/me", {
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
 
+        const response = await fetch("/auth/me", {
             headers: {
-                "Authorization": `Bearer ${token}`,
+                ...authHeaders,
                 "Accept": "application/json"
             }
-
         });
 
         if (response.status === 401) {
@@ -58,6 +75,9 @@ async function loadCurrentUser() {
         document.getElementById("profile-image").src =
             `https://ui-avatars.com/api/?background=1DB954&color=fff&name=${encodeURIComponent(user.username)}`;
 
+        currentUser = user;
+        updateGreeting();
+
     }
 
     catch (err) {
@@ -74,15 +94,14 @@ async function loadFavoriteIds() {
 
     try {
 
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
+
         const response = await fetch("/favorite", {
-
             headers: {
-
-                "Authorization": `Bearer ${token}`,
+                ...authHeaders,
                 "Accept": "application/json"
-
             }
-
         });
 
         if (response.status === 401) {
@@ -141,11 +160,12 @@ window.addEventListener("click", function (e) {
 
 function logout() {
 
+    localStorage.removeItem("token");
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_type");
     localStorage.removeItem("user");
 
-    window.location.href = "/user/default";
+    window.location.href = "/default";
 
 }
 
@@ -153,13 +173,14 @@ async function loadSongs() {
 
     try {
 
-        const response = await fetch("/songs/", {
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
 
+        const response = await fetch("/songs/", {
             headers: {
-                "Authorization": `Bearer ${token}`,
+                ...authHeaders,
                 "Accept": "application/json"
             }
-
         });
 
         if (response.status === 401) {
@@ -192,6 +213,21 @@ function showFavorites() {
     filteredSongs = songs.filter(song =>
         favorites.has(song.youtube_id)
     );
+
+    renderSongs();
+
+}
+
+function showShuffle() {
+
+    const shuffledSongs = [...songs];
+
+    for (let i = shuffledSongs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledSongs[i], shuffledSongs[j]] = [shuffledSongs[j], shuffledSongs[i]];
+    }
+
+    filteredSongs = shuffledSongs;
 
     renderSongs();
 
@@ -273,16 +309,12 @@ async function toggleFavorite(youtube_id) {
                 ? "DELETE"
                 : "POST";
 
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
+
         const response = await fetch(`/favorite/${youtube_id}`, {
-
             method,
-
-            headers: {
-
-                "Authorization": `Bearer ${token}`
-
-            }
-
+            headers: authHeaders
         });
 
         if (!response.ok) {
@@ -455,17 +487,15 @@ function playSong(songOrIndex) {
 
 function togglePlay() {
 
-    if (!currentSong)
+    if (!currentSong || !player.src) {
+        alert("Please select a song first.");
         return;
+    }
 
     if (player.paused) {
-
         player.play();
-
     } else {
-
         player.pause();
-
     }
 
 }
@@ -509,11 +539,22 @@ function prevSong() {
 
 async function randomSong() {
 
+    const authHeaders = getAuthHeaders();
+    if (!authHeaders) return;
+
     const response = await fetch("/songs/random", {
-        headers: {
-            "Authorization": "Bearer " + token
-        }
+        headers: authHeaders
     });
+
+    if (response.status === 401) {
+        logout();
+        return;
+    }
+
+    if (!response.ok) {
+        console.error("Unable to load random song", response.status, response.statusText);
+        return;
+    }
 
     const song = await response.json();
 
@@ -551,25 +592,23 @@ function updateGreeting() {
     let greeting = "Hello";
 
     if (hour >= 5 && hour < 12) {
-
         greeting = "Good Morning";
-
     } else if (hour >= 12 && hour < 17) {
-
         greeting = "Good Afternoon";
-
     } else if (hour >= 17 && hour < 21) {
-
         greeting = "Good Evening";
-
     } else {
-
         greeting = "Good Night";
-
     }
 
+    const capitalize = value => value
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+
+    const name = currentUser?.username ? `, ${capitalize(currentUser.username)}` : "";
     document.getElementById("greeting").textContent =
-        greeting;
+        `${greeting}${name}`;
 
 }
 
