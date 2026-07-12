@@ -150,9 +150,10 @@
 
                 <button id="homeBtn">🏠 Back to Home</button>
 
-                <button id="openFetchBtn" style="margin-top:15px;background:#FFBF00;">
-                    🎵 Fetch YouTube
+                <button id="openFetchBtn" type="button" style="background:#FFBF00; margin-top:15px;" class="image-btn">
+                    <img src="/static/images/icons8-download-100.png" width="100"> Fetch YouTube
                 </button>
+
 
                 <button id="logoutBtn" style="margin-top:15px;background:#ff4d4d;">
                     Logout
@@ -166,12 +167,16 @@
                     <input id="fetchUrl" type="url" placeholder="Paste YouTube Video or Playlist URL">
                 </div>
 
-                <button style="background:#FFBF00;" id="fetchBtn">🎵 Fetch</button>
+
+                <button id="fetchBtn" type="button" style="background:#FFBF00;" class="image-btn">
+                    <img src="/static/images/icons8-download-100.png" width="100"> Fetch
+                </button>
 
                 <div id="fetchStatus"></div>
 
 
-                <p style="margin-top:18px;text-align:center;"><button type="button" id="backFromFetch">🏠 Back To Home</button>
+                <p style="margin-top:18px;text-align:center;"><button type="button" id="backFromFetch">🏠 Back To
+                        Home</button>
                 </p>
 
             </div>
@@ -213,7 +218,7 @@
                     await showProfile();
 
                     setTimeout(() => {
-                        window.location.href =API_URL;
+                        window.location.href = API_URL;
                     }, 2000);
                 } else { show("Registration successful"); toggleMode(); }
             }
@@ -247,7 +252,7 @@
 
         $("backFromFetch").onclick = (e) => {
             e.preventDefault();
-      
+
             window.location.href = API_URL;
         };
 

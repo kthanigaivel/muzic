@@ -539,38 +539,16 @@ function prevSong() {
 
 async function randomSong() {
 
-    const authHeaders = getAuthHeaders();
-    if (!authHeaders) return;
+    const activeList = filteredSongs.length ? filteredSongs : songs;
 
-    const response = await fetch("/songs/random", {
-        headers: authHeaders
-    });
-
-    if (response.status === 401) {
-        logout();
+    if (activeList.length === 0) {
+        console.error("No songs available for random selection");
         return;
     }
 
-    if (!response.ok) {
-        console.error("Unable to load random song", response.status, response.statusText);
-        return;
-    }
+    const randomIndex = Math.floor(Math.random() * activeList.length);
 
-    const song = await response.json();
-
-    // Always reset to the full library
-    filteredSongs = [...songs];
-
-    const index = filteredSongs.findIndex(
-        s => s.youtube_id === song.youtube_id
-    );
-
-    if (index === -1) {
-        console.error("Song not found in local list");
-        return;
-    }
-
-    playSong(song);
+    playSong(randomIndex);
 }
 
 

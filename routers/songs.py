@@ -63,19 +63,4 @@ def add_play_history(
     }
     
 
-
-@router.get("/random")
-def random_song(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    song = db.query(Song).order_by(func.random()).first()
-
-    if song is None:
-        raise HTTPException(
-            status_code=404,
-            detail="No songs found."
-        )
-    return song
-
         
