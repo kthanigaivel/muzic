@@ -31,12 +31,25 @@
                 🏠 Home
             </div>
 
+            <a profile class="menu-item" href="/default">
+                👤 Profile
+            </a>
+
+            <a dashboard class="menu-item" href="/dash">
+                📊 Dashboard
+            </a>
+            
+
             <div class="menu-item" onclick="showFavorites()">
                 ❤️ Favorites
             </div>
+
             <a class="menu-item" href="#" onclick="showShuffle(); return false;">
                 🔀 Shuffle
             </a>
+
+
+
 
         </div>
 
@@ -60,6 +73,9 @@
                         ▼
 
                         <div id="profile-menu" class="profile-menu">
+                            <a loadsongs href="#" onclick="loadSongs();return false;">
+                                🏠 Home
+                            </a>
 
                             <a href="/default">
                                 👤 Profile
@@ -67,6 +83,14 @@
 
                             <a href="/dash">
                                 📊 Dashboard
+                            </a>
+
+                            <a loadfavorites href="#" onclick="showFavorites();return false;">
+                                ❤️ Favorites
+                            </a>
+
+                            <a shuffle href="#" onclick="showShuffle();return false;">
+                                🔀 Shuffle
                             </a>
 
                             <a href="#" onclick="logout();return false;">
