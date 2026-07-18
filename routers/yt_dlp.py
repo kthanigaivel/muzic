@@ -6,6 +6,8 @@ import requests
 
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.concurrency import run_in_threadpool
+
 
 from app.auth.dependencies import get_current_user
 from app.models import User
@@ -13,7 +15,6 @@ from app.models import User
 from app.models import Song,DownloadHistory
 from app.auth.database import get_db
 from sqlalchemy.orm import Session
-
 
 router = APIRouter(
     prefix="/fetch",
@@ -25,13 +26,18 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
+
+
 def download_song(
     video_url: str,
     db: Session,
     current_user: User,
     playlist_id: str | None = None,
     playlist_title: str | None = None,
-):
+    ):
+    
+    
+ 
     # First get metadata only
     with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
         info = ydl.extract_info(video_url, download=False)
@@ -120,6 +126,14 @@ def download_song(
                 f.write(r.content)
 
     try:
+        song=existing
+        if song is None:
+            song = Song(
+                youtube_id=youtube_id,
+                filename=title,
+            )
+             
+            
         song = Song(
             youtube_id=youtube_id,
             filename=title,
