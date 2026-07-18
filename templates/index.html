@@ -25,32 +25,13 @@
 
             <div class="logo">
                 🎵 Velora
-            </div>
-
-            <div class="menu-item" onclick="loadSongs()">
-                🏠 Home
-            </div>
-
-            <a profile class="menu-item" href="/default">
-                👤 Profile
-            </a>
-
-            <a dashboard class="menu-item" href="/dash">
-                📊 Dashboard
-            </a>
-            
-
-            <div class="menu-item" onclick="showFavorites()">
-                ❤️ Favorites
-            </div>
-
-            <a class="menu-item" href="#" onclick="showShuffle(); return false;">
-                🔀 Shuffle
-            </a>
-
-
-
-
+            </div>  
+            <a class="menu-item" href="#" onclick="loadSongs(); return false;"> 🏠 Home </a>
+            <a class="menu-item" href="/default">👤 Profile</a>
+            <a class="menu-item" href="/fetch">🎵 Fetch</a>
+            <a class="menu-item" href="/dash">📊 Dashboard</a>
+            <a class="menu-item" href="#" onclick="showFavorites(); return false;">❤️ Favorites</a>
+            <a class="menu-item" href="#" onclick="showShuffle(); return false;">🔀 Shuffle</a>
         </div>
 
         <div class="main">
@@ -79,6 +60,10 @@
 
                             <a href="/default">
                                 👤 Profile
+                            </a>
+
+                            <a href="/fetch">
+                                🎵 Fetch
                             </a>
 
                             <a href="/dash">
@@ -174,7 +159,7 @@
 
     </div>
 
-    <script src="/static/js/index.js?v=3"></script>
+    <script src="/static/js/index.js"></script>
 
 </body>
 

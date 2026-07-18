@@ -6,13 +6,11 @@ import requests
 
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
-from starlette.background import BackgroundTask
 
 from app.auth.dependencies import get_current_user
 from app.models import User
 
-from app.models import Song,DownloadHistory,PlayHistory
+from app.models import Song,DownloadHistory
 from app.auth.database import get_db
 from sqlalchemy.orm import Session
 
@@ -26,16 +24,64 @@ BASE_DIR = "/opt/muzic/"
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
- 
-def remove_file(path: str):
-    """Delete file after response is sent."""
-    if os.path.exists(path):
-        os.remove(path)
 
+def download_song(
+    video_url: str,
+    db: Session,
+    current_user: User,
+    playlist_id: str | None = None,
+    playlist_title: str | None = None,
+):
+    # First get metadata only
+    with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+        info = ydl.extract_info(video_url, download=False)
 
+    if info is None:
+        return None
 
+    youtube_id = info["id"]
+    title = info["title"]
 
-def download_song(video_url: str, db: Session, current_user: User,playlist_id: str | None = None,playlist_title: str | None = None,):
+    mp3_path = os.path.join(DOWNLOAD_DIR, f"{youtube_id}.mp3")
+    thumbnail_path = os.path.join(DOWNLOAD_DIR, f"{youtube_id}.jpg")
+
+    existing = db.query(Song).filter(
+        Song.youtube_id == youtube_id
+    ).first()
+
+    # Already downloaded -> don't download again
+    if existing and os.path.exists(mp3_path):
+
+        if not os.path.exists(thumbnail_path):
+            url = f"https://img.youtube.com/vi/{youtube_id}/hqdefault.jpg"
+            r = requests.get(url, timeout=10)
+            if r.ok:
+                with open(thumbnail_path, "wb") as f:
+                    f.write(r.content)
+
+        try:
+            history = DownloadHistory(
+                user_id=current_user.id,
+                youtube_id=youtube_id,
+                youtube_playlist_id=playlist_id,
+                playlist_title=playlist_title,
+            )
+
+            db.add(history)
+            db.commit()
+
+        except Exception:
+            db.rollback()
+            raise
+
+        return {
+            "youtube_id": youtube_id,
+            "title": title,
+            "thumbnail": thumbnail_path,
+            "status": "exists",
+        }
+
+    # Download the song
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": os.path.join(DOWNLOAD_DIR, "%(id)s.%(ext)s"),
@@ -59,43 +105,47 @@ def download_song(video_url: str, db: Session, current_user: User,playlist_id: s
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_url, download=True)
-        if info is None:
-            return None
-        
 
-    mp3_path = os.path.join(DOWNLOAD_DIR, f"{info['id']}.mp3")
+    if info is None:
+        return None
 
     if not os.path.exists(mp3_path):
         return None
 
-    existing = db.query(Song).filter(
-        Song.youtube_id == info["id"]
-    ).first()
+    if not os.path.exists(thumbnail_path):
+        url = f"https://img.youtube.com/vi/{youtube_id}/hqdefault.jpg"
+        r = requests.get(url, timeout=10)
+        if r.ok:
+            with open(thumbnail_path, "wb") as f:
+                f.write(r.content)
 
-    if not existing:
+    try:
         song = Song(
-            youtube_id=info["id"],
-            filename=info["title"],
+            youtube_id=youtube_id,
+            filename=title,
         )
-        
+
         history = DownloadHistory(
             user_id=current_user.id,
-            youtube_id=info["id"],
-            youtube_playlist_id=playlist_id,   # None for single videos
-            playlist_title=playlist_title,     # None for single videos
+            youtube_id=youtube_id,
+            youtube_playlist_id=playlist_id,
+            playlist_title=playlist_title,
         )
- 
+
         db.add(song)
-        db.commit()
         db.add(history)
         db.commit()
 
+    except Exception:
+        db.rollback()
+        raise
+
     return {
-        "youtube_id": info["id"],
-        "title": info["title"],
-        "status": "exists" if existing else "downloaded",
+        "youtube_id": youtube_id,
+        "title": title,
+        "thumbnail": thumbnail_path,
+        "status": "downloaded",
     }
-    
     
 @router.post("/youtube")
 def fetch_youtube_audio(
@@ -152,6 +202,11 @@ def fetch_youtube_audio(
             db,
             current_user,
         )
+        if result is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Unable to download this YouTube video."
+            )   
 
         return {
             "success": True,
@@ -159,6 +214,11 @@ def fetch_youtube_audio(
             **result,
         }
 
-    except Exception:
-        traceback.print_exc()
+    except HTTPException:
         raise
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while processing the request: {str(e)}"
+        )

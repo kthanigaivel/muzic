@@ -12,6 +12,8 @@ from app.auth.security import (
     create_access_token,
 )
 from app.auth.dependencies import get_current_user
+from app.models import DownloadHistory
+from app.models.playHistory import PlayHistory
 
 router = APIRouter(
     prefix="/auth",
@@ -100,20 +102,31 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         },
     }
     
+
 @router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    if current_user.id != user_id and current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized to delete this user")   
-    
-    session=db.query(PlayHistory).filter(PlayHistory.user_id==user_id).delete()
-    session=db.query(User).filter(User.id==user_id).delete()
-    
-    db.commit()
 
+    if current_user.id != user_id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Delete dependent records first
+    db.query(PlayHistory).filter(
+        PlayHistory.user_id == user_id
+    ).delete(synchronize_session=False)
+
+    db.query(DownloadHistory).filter(
+        DownloadHistory.user_id == user_id
+    ).delete(synchronize_session=False)
+
+    db.delete(user)
+    db.commit()
 
     return {"detail": "User deleted successfully"}
 

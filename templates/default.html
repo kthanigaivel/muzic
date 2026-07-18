@@ -150,40 +150,17 @@
 
                 <button id="homeBtn">🏠 Back to Home</button>
 
-                <button id="openFetchBtn" type="button" style="background:#FFBF00; margin-top:15px;" class="image-btn">
-                       🎵 Fetch YouTube
-                </button>
-
-
                 <button id="logoutBtn" style="margin-top:15px;background:#ff4d4d;">
                     Logout
                 </button>
             </div>
 
-            <div id="fetchView" class="view">
-                <h2>Fetch YouTube</h2>
 
-                <div style="margin-bottom:18px; ">
-                    <input id="fetchUrl" type="url" placeholder="Paste YouTube Video or Playlist URL">
-                </div>
-
-
-                <button id="fetchBtn" type="button" style="background:#FFBF00;" class="image-btn">
-                    🎵 Fetch
-                </button>
-
-                <div id="fetchStatus"></div>
-
-
-                <p style="margin-top:18px;text-align:center;"><button type="button" id="backFromFetch">🏠 Back To
-                        Home</button>
-                </p>
-
-            </div>
         </div>
     </div>
     <script>
-        const API_URL = "http://velora"; let isLogin = true;
+        const API_URL = window.location.origin; 
+        let isLogin = true;
         const $ = id => document.getElementById(id);
         function show(m, e = false) { const s = $("status"); s.innerText = m; s.className = e ? "error" : "success"; }
         function toggleMode() {
@@ -219,7 +196,7 @@
 
                     setTimeout(() => {
                         window.location.href = API_URL;
-                    }, 2000);
+                    }, 0);
                 } else { show("Registration successful"); toggleMode(); }
             }
             catch (err) { show(err.message || "Server error", true) }
@@ -240,68 +217,7 @@
             window.location.href = API_URL;
         };
 
-        // Fetch view wiring
-        $("openFetchBtn").onclick = (e) => {
-            e.preventDefault();
-            if (!localStorage.getItem("token")) { alert("Please login first."); return; }
-            $("authView").classList.remove("active");
-            $("profileView").classList.remove("active");
-            $("fetchView").classList.add("active");
-            $("fetchUrl").focus();
-        };
 
-        $("backFromFetch").onclick = (e) => {
-            e.preventDefault();
-
-            window.location.href = API_URL;
-        };
-
-        $("fetchBtn").onclick = fetchMusic;
-
-        async function setFetchStatus(message, isError = false) {
-            const s = $("fetchStatus"); s.innerHTML = message; s.className = isError ? "error" : "success";
-        }
-
-        async function fetchMusic() {
-            let url = $("fetchUrl").value.trim();
-            if (!url) { setFetchStatus("Please enter a YouTube URL.", true); return; }
-
-            const ampIndex = url.indexOf("&");
-            if (ampIndex !== -1) {
-                url = url.slice(0, ampIndex);
-            }
-
-            const token = localStorage.getItem("token") || localStorage.getItem("access_token");
-            if (!token) { alert("Please login first."); return; }
-
-            const btn = $("fetchBtn"); btn.disabled = true; btn.textContent = "⏳ Fetching...";
-            setFetchStatus("");
-
-            try {
-                const resp = await fetch(API_URL + "/fetch/youtube?url=" + encodeURIComponent(url), {
-                    method: "POST",
-                    headers: { Authorization: "Bearer " + token }
-                });
-
-                const data = await resp.json().catch(() => ({}));
-                if (!resp.ok) throw new Error(data.detail || "Fetch failed.");
-
-                $("fetchUrl").value = "";
-
-                if (data.type === "playlist") {
-                    setFetchStatus(`✅ Playlist downloaded successfully.<br><br><strong>${data.playlist}</strong><br>${data.count} song(s) processed.${data.path ? `<br><small>Saved to: ${data.path}</small>` : ""}`);
-                } else {
-                    setFetchStatus(`✅ Audio downloaded successfully.<br><br><strong>${data.title}</strong>${data.path ? `<br><small>Saved to: ${data.path}</small>` : ""}`);
-                }
-
-                console.log(data);
-
-            } catch (err) {
-                setFetchStatus(err.message || "Fetch error", true);
-            } finally {
-                btn.disabled = false; btn.textContent = "🎵 Fetch";
-            }
-        }
     </script>
 </body>
 

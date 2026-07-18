@@ -98,3 +98,12 @@ def index(request: Request):
         {}
     )
     
+    
+@app.get("/fetch")
+def index(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "fetch.html",
+        {}
+    )
+    
