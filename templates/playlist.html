@@ -1,0 +1,205 @@
+<html<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>W3Schools Default Template</title>
+
+        <!-- CSS Styles (Internal) -->
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background-color: #f1f1f1;
+                text-align: center;
+            }
+
+            .container {
+                background-color: white;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                max-width: 500px;
+                margin: 50px auto;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 15px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+
+            button {
+                padding: 10px 18px;
+                margin: 5px;
+                cursor: pointer;
+                border: none;
+                background: #2196F3;
+                color: white;
+                border-radius: 5px;
+                font-size: 15px;
+            }
+
+            button:hover {
+                background: #1976D2;
+            }
+
+            #progress {
+                width: 100%;
+                height: 20px;
+                background: #ddd;
+                border-radius: 10px;
+                overflow: hidden;
+                margin-top: 20px;
+            }
+
+            #bar {
+                width: 0%;
+                height: 100%;
+                background: #4CAF50;
+                transition: width .3s ease;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <!-- HTML Structure -->
+        <div class="container">
+            <div class="container">
+
+                <h2>YouTube Playlist Downloader</h2>
+
+                <input type="text" id="playlist" placeholder="Paste YouTube Playlist URL" style="
+            width:100%;
+            padding:12px;
+            margin-bottom:20px;
+            box-sizing:border-box;
+            font-size:16px;
+        ">
+
+
+
+                <br><br>
+
+                <button onclick="preview()">
+                    Preview
+                </button>
+
+                <button onclick="download()">
+                    Download
+                </button>
+
+                <div id="playlistInfo"></div>
+
+                <div id="progress">
+                    <div id="bar"></div>
+                </div>
+
+                <p id="status"></p>
+
+            </div>
+        </div>
+
+        <!-- JavaScript Logic -->
+        <script>
+            function getPlaylistUrl() {
+                return document.getElementById("playlist").value.trim();
+            }
+
+
+            async function preview() {
+
+                const url = getPlaylistUrl();
+
+                if (!url) {
+                    alert("Please enter a playlist URL.");
+                    return;
+                }
+
+                const r = await fetch(
+                    `http://localhost:8000/playlist-info?url=${encodeURIComponent(url)}`
+                );
+
+                const data = await r.json();
+
+                let html = `
+                        <h2>${data.title}</h2>
+                        <p>${data.count} videos</p>
+                        <img src="${data.thumbnail}" width="250">
+                        `;
+
+                data.videos.forEach(v => {
+
+                    html += `
+                        <div>
+
+                        <img src="${v.thumbnail}" width="120">
+
+                        ${v.title}
+
+                        </div>
+                        `;
+
+                });
+
+                document.getElementById("playlistInfo").innerHTML = html;
+
+            }
+
+            async function download() {
+
+
+                const url = getPlaylistUrl();
+
+                if (!url) {
+                    alert("Please enter a playlist URL.");
+                    return;
+                }
+
+                const r = await fetch(
+                    "http://localhost:8000/download",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            url,
+                            audio_only: audio
+                        })
+                    }
+                );
+
+                const data = await r.json();
+
+                const ws = new WebSocket(
+                    `ws://localhost:8000/ws/${data.job_id}`
+                );
+
+                ws.onmessage = (event) => {
+
+                    const msg = JSON.parse(event.data);
+
+                    document.getElementById("status").innerHTML = msg.status;
+
+                    if (msg.percent) {
+
+                        document.getElementById("bar").style.width = msg.percent + "%";
+
+                    }
+
+                };
+
+            }
+        </script>
+
+    </body>
+
+    </html>

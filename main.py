@@ -106,4 +106,12 @@ def index(request: Request):
         "fetch.html",
         {}
     )
+
+@app.get("/download")
+def index(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "playlist.html",
+        {}
+    )
     
