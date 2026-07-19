@@ -160,25 +160,24 @@ def playlist_info(url:str):
             for e in entries
         ]
     }
+import asyncio
 
 @app.post("/download")
-async def download(
-    req:PlaylistRequest,
-    bg:BackgroundTasks
-):
+async def download(req: PlaylistRequest, background_tasks: BackgroundTasks):
 
     job_id = str(uuid.uuid4())
 
-    bg.add_task(
+    loop = asyncio.get_running_loop()
+
+    background_tasks.add_task(
         download_playlist,
         req.url,
         job_id,
-        manager
+        manager,
+        loop,
     )
 
-    return {
-        "job_id":job_id
-    }
+    return {"job_id": job_id}
 
 @app.websocket("/ws/{job_id}")
 async def websocket(

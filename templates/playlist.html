@@ -1,204 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>W3Schools Default Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSS Styles (Internal) -->
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f1f1f1;
-            text-align: center;
-        }
+<title>YouTube Downloader</title>
 
-        .container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 50px auto;
-        }
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    margin:0;
+}
 
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
+.container{
+    max-width:700px;
+    margin:40px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:8px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
 
-        button {
-            padding: 10px 18px;
-            margin: 5px;
-            cursor: pointer;
-            border: none;
-            background: #2196F3;
-            color: white;
-            border-radius: 5px;
-            font-size: 15px;
-        }
+input{
+    width:100%;
+    padding:12px;
+    font-size:16px;
+    box-sizing:border-box;
+}
 
-        button:hover {
-            background: #1976D2;
-        }
+button{
+    margin-top:15px;
+    padding:10px 20px;
+    cursor:pointer;
+}
 
-        #progress {
-            width: 100%;
-            height: 20px;
-            background: #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
+#progress{
+    width:100%;
+    height:22px;
+    background:#ddd;
+    margin-top:20px;
+    border-radius:20px;
+    overflow:hidden;
+}
 
-        #bar {
-            width: 0%;
-            height: 100%;
-            background: #4CAF50;
-            transition: width .3s ease;
-        }
-    </style>
+#bar{
+    width:0%;
+    height:100%;
+    background:#4caf50;
+    transition:.25s;
+}
+
+#playlistInfo{
+    margin-top:20px;
+}
+
+.thumb{
+    width:160px;
+    border-radius:6px;
+}
+
+#status{
+    margin-top:15px;
+    font-weight:bold;
+}
+
+#current{
+    margin-top:10px;
+}
+</style>
+
 </head>
-
 <body>
 
-    <!-- HTML Structure -->
-    <div class="container">
-        <div class="container">
+<div class="container">
 
-            <h2>YouTube Playlist Downloader</h2>
+<h2>YouTube Downloader</h2>
 
-            <input type="text" id="playlist" placeholder="Paste YouTube Playlist URL" style="
-            width:100%;
-            padding:12px;
-            margin-bottom:20px;
-            box-sizing:border-box;
-            font-size:16px;
-        ">
+<input
+id="playlist"
+placeholder="Paste YouTube video or playlist URL">
 
+<br>
 
+<button onclick="preview()">Preview</button>
+<button onclick="downloadPlaylist()">Download</button>
 
-            <br><br>
+<div id="playlistInfo"></div>
 
-            <button onclick="preview()">
-                Preview
-            </button>
+<div id="progress">
+<div id="bar"></div>
+</div>
 
-            <button onclick="download()">
-                Download
-            </button>
+<div id="current"></div>
+<div id="status"></div>
 
-            <div id="playlistInfo"></div>
+</div>
 
-            <div id="progress">
-                <div id="bar"></div>
+<script>
+
+function getUrl(){
+    return document.getElementById("playlist").value.trim();
+}
+
+async function preview(){
+
+    const url=getUrl();
+
+    if(!url){
+        alert("Enter URL");
+        return;
+    }
+
+    const r=await fetch(`/playlist-info?url=${encodeURIComponent(url)}`);
+    const data=await r.json();
+
+    let html=`
+        <h3>${data.title}</h3>
+        <p>${data.count} item(s)</p>
+        <img class="thumb" src="${data.thumbnail}">
+    `;
+
+    if(data.videos){
+
+        data.videos.forEach(v=>{
+
+            html+=`
+            <div style="margin-top:10px">
+                <img src="${v.thumbnail}" width="90">
+                ${v.title}
             </div>
+            `;
 
-            <p id="status"></p>
+        });
 
-        </div>
-    </div>
+    }
 
-    <!-- JavaScript Logic -->
-    <script>
-        const API_URL = window.location.origin;
-        function getPlaylistUrl() {
-            return document.getElementById("playlist").value.trim();
-        }
+    document.getElementById("playlistInfo").innerHTML=html;
 
+}
 
-        async function preview() {
+async function downloadPlaylist(){
 
-            const url = getPlaylistUrl();
+    const url=getUrl();
 
-            if (!url) {
-                alert("Please enter a playlist URL.");
-                return;
-            }
+    if(!url){
+        alert("Enter URL");
+        return;
+    }
 
-            const r = await fetch(
-                `/playlist-info?url=${encodeURIComponent(url)}`
-            );
+    document.getElementById("bar").style.width="0%";
+    document.getElementById("status").innerHTML="Starting...";
 
-            const data = await r.json();
+    const r=await fetch("/download",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            url:url
+        })
+    });
 
-            let html = `
-                        <h2>${data.title}</h2>
-                        <p>${data.count} videos</p>
-                        <img src="${data.thumbnail}" width="250">
-                        `;
+    const data=await r.json();
 
-            data.videos.forEach(v => {
+    const protocol=location.protocol==="https:"?"wss":"ws";
 
-                html += `
-                        <div>
+    const ws=new WebSocket(
+        `${protocol}://${location.host}/ws/${data.job_id}`
+    );
 
-                        <img src="${v.thumbnail}" width="120">
+    ws.onmessage=(event)=>{
 
-                        ${v.title}
+        const msg=JSON.parse(event.data);
 
-                        </div>
-                        `;
+        if(msg.overall_percent!==undefined){
 
-            });
-
-            document.getElementById("playlistInfo").innerHTML = html;
+            document.getElementById("bar").style.width=
+                msg.overall_percent+"%";
 
         }
 
-        async function download() {
+        if(msg.current!==undefined){
 
+            document.getElementById("current").innerHTML=
+                `Video ${msg.current} / ${msg.total}`;
 
-            const url = getPlaylistUrl();
-
-            if (!url) {
-                alert("Please enter a playlist URL.");
-                return;
-            }
-
-            const r = await fetch(`/download`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    url
-                })
-            });
-
-            const data = await r.json();
-
-            const protocol = location.protocol === "https:" ? "wss" : "ws";
-            const ws = new WebSocket(
-                `${protocol}://${location.host}/ws/${data.job_id}`
-            );
-
-            ws.onmessage = (event) => {
-
-                const msg = JSON.parse(event.data);
-
-                document.getElementById("status").innerHTML = `
-                    ${msg.status}<br>
-                    ${msg.current || 0} / ${msg.total || 0}<br>
-                    ${msg.title || ""}
-                `;
-
-                if (msg.overall_percent !== undefined) {
-                    document.getElementById("bar").style.width =
-                        `${msg.overall_percent}%`;
-                }
-            };
         }
-    </script>
+
+        let status=msg.status;
+
+        if(msg.title){
+
+            status+=`<br>${msg.title}`;
+
+        }
+
+        document.getElementById("status").innerHTML=status;
+
+        if(msg.status==="completed"){
+
+            document.getElementById("bar").style.width="100%";
+
+            document.getElementById("status").innerHTML=
+                "✅ Download completed";
+
+            ws.close();
+
+        }
+
+        if(msg.status==="error"){
+
+            document.getElementById("status").innerHTML=
+                "❌ "+msg.message;
+
+            ws.close();
+
+        }
+
+    };
+
+    ws.onerror=()=>{
+
+        document.getElementById("status").innerHTML=
+            "WebSocket error";
+
+    };
+
+}
+</script>
 
 </body>
-
 </html>
