@@ -14,7 +14,7 @@ class ConnectionManager:
 
     async def send(self, job_id: str, message: dict):
         ws = self.connections.get(job_id)
-
+ 
         if ws:
             await ws.send_json(message)
 

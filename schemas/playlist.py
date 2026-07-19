@@ -1,4 +1,4 @@
 from pydantic import BaseModel
 
 class PlaylistRequest(BaseModel):
-    url: str
+    video_url: str
