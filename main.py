@@ -21,6 +21,23 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from fastapi.responses import FileResponse
 
+
+
+import uuid
+import yt_dlp
+
+from fastapi import FastAPI
+from fastapi import BackgroundTasks
+from fastapi import WebSocket
+from fastapi.middleware.cors import CORSMiddleware
+
+from .downloader import download_playlist
+from .manager import manager
+from app.schemas.playlist import PlaylistRequest
+
+
+
+
 app = FastAPI(
     title="Muzic API",
     version="1.0.0",
@@ -115,3 +132,66 @@ def index(request: Request):
         {}
     )
     
+
+
+@app.get("/playlist-info")
+def playlist_info(url:str):
+
+    opts = {
+        "extract_flat":True,
+        "quiet":True
+    }
+
+    with yt_dlp.YoutubeDL(opts) as ydl:
+
+        info = ydl.extract_info(url,download=False)
+
+    entries = info.get("entries",[])
+
+    return {
+        "title":info["title"],
+        "count":len(entries),
+        "thumbnail":info.get("thumbnail"),
+        "videos":[
+            {
+                "title":e["title"],
+                "thumbnail":e.get("thumbnails",[{}])[-1].get("url")
+            }
+            for e in entries
+        ]
+    }
+
+@app.post("/download")
+async def download(
+    req:PlaylistRequest,
+    bg:BackgroundTasks
+):
+
+    job_id = str(uuid.uuid4())
+
+    bg.add_task(
+        download_playlist,
+        req.url,
+        job_id,
+        manager
+    )
+
+    return {
+        "job_id":job_id
+    }
+
+@app.websocket("/ws/{job_id}")
+async def websocket(
+    websocket:WebSocket,
+    job_id:str
+):
+
+    await manager.connect(job_id,websocket)
+
+    try:
+        while True:
+            await websocket.receive_text()
+
+    except:
+
+        manager.disconnect(job_id)
