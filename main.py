@@ -8,11 +8,11 @@ import app.models.user
 
 # Import API routers
 from app.routers.auth import router as auth_router
-from app.routers.yt_dlp import router as import_router
 from app.routers.songs import  router as songs_router
 from app.routers.favorite import router as fav_router
 from app.routers.dashboard import router as dash_router
 from app.routers.clean import router as clean_router
+from app.routers.yt import router as yt_router
 
 
 from fastapi.templating import Jinja2Templates
@@ -21,6 +21,8 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from fastapi.responses import FileResponse
 
+
+ 
 app = FastAPI(
     title="Muzic API",
     version="1.0.0",
@@ -41,12 +43,11 @@ Base.metadata.create_all(bind=engine)
 
 # Register routers
 app.include_router(auth_router)
-app.include_router(import_router)
 app.include_router(songs_router)
 app.include_router(fav_router)
 app.include_router(dash_router)
 app.include_router(clean_router)
-
+app.include_router(yt_router)
 
 
 templates = Jinja2Templates(directory="/opt/muzic/app/templates")
@@ -99,11 +100,12 @@ def index(request: Request):
     )
     
     
-@app.get("/fetch")
+ 
+@app.get("/download")
 def index(request: Request):
     return templates.TemplateResponse(
         request,
-        "fetch.html",
+        "playlist.html",
         {}
     )
     
