@@ -92,29 +92,4 @@ async def websocket(websocket: WebSocket, job_id: str):
     except WebSocketDisconnect:
         manager.disconnect(job_id)
         
-        
-        """ 
-@router.websocket("/ws/{job_id}")
-async def websocket(
-    websocket: WebSocket,
-    job_id: str,
-):
-    token = websocket.query_params.get("token")
-
-    if not token:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-        return
-
-    try:
-        current_user = await get_current_user_ws(token)
-    except Exception:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-        return
-
-    await manager.connect(job_id, websocket)
-
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(job_id) """
+       

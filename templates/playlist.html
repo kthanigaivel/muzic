@@ -202,29 +202,43 @@
                 const msg = JSON.parse(event.data);
 
                 if (msg.overall_percent !== undefined) {
-
                     document.getElementById("bar").style.width =
                         msg.overall_percent + "%";
-
                 }
 
                 if (msg.current !== undefined) {
-
                     document.getElementById("current").innerHTML =
                         `Video ${msg.current} / ${msg.total}`;
-
                 }
 
-                let status = msg.status;
+                // Already downloaded
+                if (msg.status === "exists") {
 
-                if (msg.title) {
+                    document.getElementById("status").innerHTML =
+                        `✅ Already downloaded<br>${msg.title}`;
 
-                    status += `<br>${msg.title}`;
-
+                    return;
                 }
 
-                document.getElementById("status").innerHTML = status;
+                // Downloading
+                if (msg.status === "downloading") {
 
+                    document.getElementById("status").innerHTML =
+                        `⬇ Downloading<br>${msg.title}`;
+
+                    return;
+                }
+
+                // Converting
+                if (msg.status === "converting") {
+
+                    document.getElementById("status").innerHTML =
+                        `🎵 Converting<br>${msg.title}`;
+
+                    return;
+                }
+
+                // Completed
                 if (msg.status === "completed") {
 
                     document.getElementById("bar").style.width = "100%";
@@ -234,24 +248,17 @@
 
                     ws.close();
 
+                    return;
                 }
 
+                // Error
                 if (msg.status === "error") {
 
                     document.getElementById("status").innerHTML =
                         "❌ " + msg.message;
 
                     ws.close();
-
-                }
-
-            };
-
-            ws.onerror = () => {
-
-                document.getElementById("status").innerHTML =
-                    "WebSocket error";
-
+                };
             };
 
         }
