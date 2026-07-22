@@ -2,164 +2,901 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velora</title>
+  <link rel="icon" type="image/x-icon" href="/static/images/music.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    body {
+      font-family: "Lucida Sans", sans-serif;
+      font-size: 17px;
+      margin: 0;
+      padding-top: 130px;
+    }
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    /* Fixed Header & Menu Container at the Top */
+    .top-nav-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-    <title>Velora</title>
-    <link rel="icon" type="image/x-icon" href="/static/images/music.png">
+    .header {
+      background-color: green;
+      text-align: center;
+      color: #ffffff;
+    }
 
-    <link rel="stylesheet" href="/static/css/index.css?v=2">
+    .header>h1 {
+      font-size: 30px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
 
+    .header>h1 img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .menu {
+      background-color: #ffffff;
+      padding: 5px 10px;
+    }
+
+    .menu ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      align-items: center;
+    }
+
+    .menu li {
+      padding: 6px 12px;
+      background-color: #33b5e5;
+      color: #ffffff;
+      white-space: nowrap;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .menu li:hover {
+      background-color: #0099cc;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-areas:
+        'main'
+        'footer';
+      background-color: white;
+      gap: 10px;
+      padding: 10px;
+      min-height: 100vh;
+    }
+
+    .content {
+      grid-area: main;
+    }
+
+    /* --- NEW SONG LIST STYLES --- */
+    #song-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+      /* Makes it clear you can click the song */
+      transition: background 0.2s;
+    }
+
+    .song-item:hover {
+      background-color: #f0f0f0;
+    }
+
+    .song-item img {
+      width: 180px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      background-color: #eee;
+    }
+
+    /* Floating Player Box */
+    .player {
+      position: fixed;
+      bottom: 5px;
+      right: 5px;
+      max-width: 100%;
+      max-height: 40%;
+      border: 5px solid #0099cc;
+      background-color: beige;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      z-index: 100;
+    }
+
+
+    .footer {
+      grid-area: footer;
+      background-color: #0099cc;
+      color: #ffffff;
+      text-align: center;
+      padding: 30px;
+      margin-bottom: 200px;
+      /* Adjusted to fit the player comfortably */
+    }
+
+    @media (min-width: 600px) {
+      body {
+        padding-top: 85px;
+      }
+
+      .top-nav-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .header {
+        background: transparent;
+      }
+
+      .header>h1 {
+        color: purple;
+        font-size: 24px;
+        margin: 0;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .current-cover {
+      width: 120px;
+      height: 120px;
+      height: auto;
+      float: left;
+      margin: 3px;
+      padding: 3px;
+    }
+
+    .song-name {
+      container-type: inline-size;
+      width: 100%;
+      /* Or any fixed/flex width */
+    }
+
+    .song-name>* {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      /* Font size automatically scales dynamically with container width */
+      font-size: clamp(14px, 4cqw, 24px);
+    }
+
+    /* Core wrapper using a fluid max-width */
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+      font-family: system-ui, sans-serif;
+    }
+
+    /* Input container that houses the icon and input field */
+    .search-wrapper {
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Absolute positioned magnifying glass icon */
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      width: 20px;
+      height: 20px;
+      color: #9ca3af;
+      pointer-events: none;
+      /* Allows clicks to pass through to the input */
+    }
+
+    /* Clean input field styling with space padding for the left icon */
+    .search {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      font-size: 16px;
+      color: #1f2937;
+      background-color: #f3f4f6;
+      border: 2px solid transparent;
+      border-radius: 30px;
+      /* Pill-shaped design */
+      outline: none;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Accessible focus effect that tints background and applies a border */
+    .search-input:focus {
+      background-color: #ffffff;
+      border-color: #3b82f6;
+      /* Modern blue highlight */
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Call-to-action submit button */
+    .search-button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #3b82f6;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .search-button:hover {
+      background-color: #2563eb;
+      /* Slightly darker blue on hover */
+    }
+  </style>
 </head>
 
 <body>
 
-    <div class="container">
+  <div class="top-nav-wrapper">
+    <div class="header">
+      <h1>
+        <img id="profile-image" src="/static/images/music.png" alt="Velora Logo">
+        Velora
+      </h1>
+      <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
+    </div>
 
-        <div class="sidebar">
+    <div class="menu">
+      <ul>
+        <li onclick="loadSongs(); return false;">🏠 Home</li>
+        <li onclick="showFavorites(); return false;">❤️ Favorites</li>
+        <li onclick="showShuffle(); return false;">🔀 Shuffle</li>
+        <li onclick="window.location.href='/default';">👤 Profile</li>
+        <li onclick="window.location.href='/dash';">📊 Dashboard</li>
+        <li onclick="window.location.href='/download';">🎵 Fetch</li>
+        <li onclick="window.location.href='/manager';">🗑 Remove Songs</li>
+        <li onclick="logout(); return false;">💥 Logout</li>
+      </ul>
+    </div>
+  </div>
 
-            <div class="logo">
-                🎵 Velora
-            </div>  
-            <a class="menu-item" href="#" onclick="loadSongs(); return false;"> 🏠 Home </a>
-            <a class="menu-item" href="/default">👤 Profile</a>
-            <a class="menu-item" href="/download">🎵 Fetch</a>
-            <a class="menu-item" href="/dash">📊 Dashboard</a>
-            <a class="menu-item" href="#" onclick="showFavorites(); return false;">❤️ Favorites</a>
-            <a class="menu-item" href="#" onclick="showShuffle(); return false;">🔀 Shuffle</a>
+  <div class="grid-container">
+    <div class="content">
+
+
+      <form class="search-container">
+        <div class="search-wrapper">
+          <!-- SVG magnifying glass icon -->
+          <svg class="search-icon" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input id="search" class="search" type="search"   placeholder="Search for tracks, artists..." aria-label="Search"
+            onkeyup="filterSongs()">
         </div>
+        <button type="submit" class="search-button">Search</button>
+      </form>
 
-        <div class="main">
+      <ul id="song-list"></ul>
+    </div>
+    <div class="footer">
+      <p>&copy; 2026 Velora. All rights to Thanigaivel K.</p>
+    </div>
+  </div>
 
-            <div class="hero">
+  <div class="player">
 
-                <div class="hero-top">
+    <audio id="player" controls>
+    </audio>
 
-                    <div>
-                        <h1 id="greeting"></h1>
-                        <p>Welcome back to Velora</p>
-                    </div>
+    <div class="controls" style="margin-top: 15px; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
+      <button class="btn" onclick="prevSong()">⏮ Prev</button>
+      <button class="btn" onclick="togglePlay()" id="playBtn">▶ Play</button>
+      <button class="btn" onclick="nextSong()">Next ⏭</button>
+      <button id="playerFavorite" onclick="toggleCurrentFavorite()">
+        🤍
+      </button>
+    </div>
+    <br>
+    <img id="current-cover" class="current-cover" src="/static/images/default-cover.jpg">
+    <div id="song-name" class="song-name">Welcome to Velora
 
-                    <div class="profile" onclick="toggleProfile()">
+    </div>
 
-                        <img id="profile-image" src="/static/images/default-cover.jpg" alt="Profile">
 
-                        <span id="profile-name"></span>
+  </div>
 
-                        ▼
+  <script>
+    // ==========================================
+    // Global State & Configuration
+    // ==========================================
+    const TOKEN = localStorage.getItem("token");
 
-                        <div id="profile-menu" class="profile-menu">
-                            <a loadsongs href="#" onclick="loadSongs();return false;">
-                                🏠 Home
-                            </a>
+    if (!TOKEN) {
+      // Redirect if unauthenticated (uncomment in production)
+      // window.location.href = "/default";
+    }
 
-                            <a href="/default">
-                                👤 Profile
-                            </a>
+    function getToken() {
+      return localStorage.getItem("token");
+    }
 
-                            <a href="/download">
-                                🎵 Fetch
-                            </a>
+    function getAuthHeaders() {
+      const token = getToken();
+      if (!token) {
+        logout();
+        return null;
+      }
+      return {
+        "Authorization": `Bearer ${token}`
+      };
+    }
 
-                            <a href="/dash">
-                                📊 Dashboard
-                            </a>
+    let songs = [];
+    let filteredSongs = [];
+    let favorites = new Set();
+    let currentUser = null;
 
-                            <a loadfavorites href="#" onclick="showFavorites();return false;">
-                                ❤️ Favorites
-                            </a>
+    let currentSong = null;
+    let currentIndex = -1;
+    let audio = null;
+    let playBtn = null;
+    let lastPlayedHistory = null;
 
-                            <a shuffle href="#" onclick="showShuffle();return false;">
-                                🔀 Shuffle
-                            </a>
+    // ==========================================
+    // DOM Initialization
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", async () => {
+      audio = document.getElementById("player") || document.getElementById("myAudio");
+      playBtn = document.getElementById("playBtn");
 
-                            <a href="#" onclick="logout();return false;">
-                                💥 Logout
-                            </a>
+      if (audio) {
+        initializePlayer();
+      }
 
+      updateGreeting();
+
+      await loadCurrentUser();
+      await loadFavoriteIds();
+      await loadSongs();
+    });
+
+    // ==========================================
+    // Authentication & User Profile
+    // ==========================================
+    async function loadCurrentUser() {
+      try {
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
+
+        const response = await fetch("/auth/me", {
+          headers: {
+            ...authHeaders,
+            "Accept": "application/json"
+          }
+        });
+
+        if (response.status === 401) {
+          logout();
+          return;
+        }
+
+        if (!response.ok) throw new Error("Failed to load user info");
+
+        const user = await response.json();
+        currentUser = user;
+
+        const profileName = document.getElementById("profile-name");
+        if (profileName) profileName.textContent = user.username;
+
+        const profileImg = document.getElementById("profile-image");
+        if (profileImg) {
+          profileImg.src = `https://ui-avatars.com/api/?background=1DB954&color=fff&name=${encodeURIComponent(user.username)}`;
+        }
+
+        updateGreeting();
+      } catch (err) {
+        console.error(err);
+        logout();
+      }
+    }
+
+    function updateGreeting() {
+      const greetingEl = document.getElementById("greeting");
+      if (!greetingEl) return;
+
+      const hour = new Date().getHours();
+      let greeting = "Hello";
+
+      if (hour >= 5 && hour < 12) {
+        greeting = "Good Morning";
+      } else if (hour >= 12 && hour < 17) {
+        greeting = "Good Afternoon";
+      } else if (hour >= 17 && hour < 21) {
+        greeting = "Good Evening";
+      } else {
+        greeting = "Good Night";
+      }
+
+      const capitalize = value => value
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+
+      const name = currentUser?.username ? `, ${capitalize(currentUser.username)}` : "";
+      greetingEl.textContent = `${greeting}${name}`;
+    }
+
+    function toggleProfile() {
+      const menu = document.getElementById("profile-menu");
+      if (menu) menu.classList.toggle("show");
+    }
+
+    window.addEventListener("click", function (e) {
+      const profile = document.querySelector(".profile");
+      const menu = document.getElementById("profile-menu");
+
+      if (profile && menu && !profile.contains(e.target)) {
+        menu.classList.remove("show");
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("token_type");
+      localStorage.removeItem("user");
+
+      window.location.href = "/default";
+    }
+
+    // ==========================================
+    // Songs & Favorites Data Fetching
+    // ==========================================
+    async function loadFavoriteIds() {
+      try {
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
+
+        const response = await fetch("/favorite", {
+          headers: {
+            ...authHeaders,
+            "Accept": "application/json"
+          }
+        });
+
+        if (response.status === 401) {
+          logout();
+          return;
+        }
+
+        if (!response.ok) throw new Error("Failed to load favorites");
+
+        const data = await response.json();
+        favorites = new Set(data.map(song => song.youtube_id));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadSongs() {
+      try {
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
+
+        const response = await fetch("/songs/", {
+          headers: {
+            ...authHeaders,
+            "Accept": "application/json"
+          }
+        });
+
+        if (response.status === 401) {
+          logout();
+          return;
+        }
+
+        if (!response.ok) throw new Error("Unable to load songs");
+
+        songs = await response.json();
+        filteredSongs = [...songs];
+
+        renderSongs(filteredSongs);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ==========================================
+    // Filtering & Sorting
+    // ==========================================
+    function showFavorites() {
+      filteredSongs = songs.filter(song => favorites.has(song.youtube_id));
+      renderSongs(filteredSongs);
+    }
+
+    function showShuffle() {
+      const shuffled = [...songs];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      filteredSongs = shuffled;
+      renderSongs(filteredSongs);
+    }
+
+    function filterSongs() {
+      const searchInput = document.getElementById("search");
+      if (!searchInput) return;
+
+      const q = searchInput.value.toLowerCase();
+      filteredSongs = songs.filter(song =>
+        song.filename.toLowerCase().includes(q) ||
+        song.youtube_id.toLowerCase().includes(q)
+      );
+
+      renderSongs(filteredSongs);
+    }
+
+    // ==========================================
+    // UI Rendering
+    // ==========================================
+    function renderSongs(songList = filteredSongs) {
+      if (!Array.isArray(songList)) {
+        console.warn("renderSongs expected an array, but received:", songList);
+        return;
+      }
+
+      // 1. Support Card Grid Container (#songs)
+      const container = document.getElementById("songs");
+      if (container) {
+        container.innerHTML = songList.map((song, index) => `
+            <div class="song-card" onclick="playSong(${index})">
+                <div class="cover">
+                    <img src="${song.cover_url || `/media/${song.youtube_id}.jpg`}" alt="Cover" onerror="this.src='/media/default.jpg'">
+                </div>
+                <div class="song-overlay">
+                    <div class="song-info">
+                        <div class="song-title">
+                            ${song.filename.split("|").slice(1).join(" ") || song.filename}
                         </div>
-
+                        <div class="song-artist">
+                            ${song.youtube_id}
+                        </div>
                     </div>
-
+                    <div class="favorite" onclick="event.stopPropagation(); toggleFavorite('${song.youtube_id}')">
+                        ${favorites.has(song.youtube_id) ? "❤️" : "🤍"}
+                    </div>
                 </div>
-
             </div>
+        `).join("");
+      }
 
-            <input id="search" class="search" placeholder="Search songs..." onkeyup="filterSongs()">
+      // 2. Support List Container (#song-list)
+      const listContainer = document.getElementById("song-list");
+      if (listContainer) {
+        listContainer.innerHTML = "";
+        songList.forEach((song, index) => {
+          const li = document.createElement("li");
+          li.className = "song-item";
+          li.onclick = () => playSong(index);
 
-            <div id="songs" class="song-grid">
-            </div>
+          const img = document.createElement("img");
+          img.src = song.cover_url || `/media/${song.youtube_id}.jpg`;
+          img.alt = song.filename || "";
+          img.onerror = () => { img.src = "/media/default.jpg"; };
 
-        </div>
-
-    </div>
-
-    <div class="player">
-
-        <div class="player-left">
-
-            <img id="current-cover" src="/static/images/default-cover.jpg">
-
-            <div>
-
-                <div id="song-name" class="song-name">
-
-                    Welcome to Velora
-
+          const details = document.createElement("div");
+          details.style.flex = "1";
+          details.innerHTML = `
+                <div class="song-title">
+                    ${song.filename.split("|").slice(1).join(" ") || song.filename}
                 </div>
-
-                <div id="artist-name" class="artist-name">
-
-                    Select a song
-
+                <div class="song-artist" style="color: #666; font-size: 14px;">
+                    ${song.youtube_id}
                 </div>
+            `;
 
-            </div>
+          const favBtn = document.createElement("div");
+          favBtn.className = "favorite";
+          favBtn.style.cursor = "pointer";
+          favBtn.innerHTML = favorites.has(song.youtube_id) ? "❤️" : "🤍";
+          favBtn.onclick = (e) => {
+            e.stopPropagation();
+            toggleFavorite(song.youtube_id);
+          };
 
-        </div>
+          li.appendChild(img);
+          li.appendChild(details);
+          li.appendChild(favBtn);
+          listContainer.appendChild(li);
+        });
+      }
+    }
 
-        <div class="player-center">
+    // ==========================================
+    // Favorite Actions
+    // ==========================================
+    async function toggleFavorite(youtube_id) {
+      try {
+        const method = favorites.has(youtube_id) ? "DELETE" : "POST";
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) return;
 
-            <div class="controls">
+        const response = await fetch(`/favorite/${youtube_id}`, {
+          method,
+          headers: authHeaders
+        });
 
-                <button onclick="prevSong()">
-                    ⏮
-                </button>
+        if (!response.ok) throw new Error("Failed to update favorite status");
 
-                <button id="playBtn" onclick="togglePlay()">
+        if (method === "POST") {
+          favorites.add(youtube_id);
+        } else {
+          favorites.delete(youtube_id);
+        }
 
-                    ▶
+        updatePlayerFavorite();
+        renderSongs(filteredSongs);
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-                </button>
+    async function toggleCurrentFavorite() {
+      if (!currentSong) return;
+      await toggleFavorite(currentSong.youtube_id);
+    }
 
-                <button onclick="nextSong()">
-                    ⏭
-                </button>
+    function updatePlayerFavorite() {
+      const btn = document.getElementById("playerFavorite");
+      if (!btn) return;
 
-                <button onclick="randomSong()">
-                    🔀
-                </button>
+      if (!currentSong) {
+        btn.textContent = "🤍";
+        return;
+      }
 
+      btn.textContent = favorites.has(currentSong.youtube_id) ? "❤️" : "🤍";
+    }
 
-                <button id="playerFavorite" onclick="toggleCurrentFavorite()">
-                    🤍
-                </button>
+    // ==========================================
+    // Audio Player Logic
+    // ==========================================
+    function initializePlayer() {
+      if (!audio) return;
 
-            </div>
+      audio.addEventListener("play", () => {
+        if (playBtn) playBtn.innerHTML = "⏸";
+      });
 
-            <audio id="player" controls>
-            </audio>
+      audio.addEventListener("pause", () => {
+        if (playBtn) playBtn.innerHTML = "▶";
+      });
 
-        </div>
+      audio.addEventListener("ended", () => {
+        nextSong();
+      });
 
-    </div>
+      audio.addEventListener("volumechange", () => {
+        localStorage.setItem("velora_volume", audio.volume);
+        localStorage.setItem("velora_muted", audio.muted);
+      });
 
-    <script src="/static/js/index.js"></script>
+      const savedVolume = localStorage.getItem("velora_volume");
+      if (savedVolume !== null) {
+        audio.volume = parseFloat(savedVolume);
+      } else {
+        audio.volume = 0.7;
+      }
+
+      const muted = localStorage.getItem("velora_muted");
+      if (muted !== null) {
+        audio.muted = muted === "true";
+      }
+
+      audio.addEventListener("playing", async () => {
+        if (!currentSong) return;
+        if (lastPlayedHistory === currentSong.youtube_id) return;
+
+        lastPlayedHistory = currentSong.youtube_id;
+
+        try {
+          const token = getToken();
+          await fetch("/songs/play?youtube_id=" + currentSong.youtube_id, {
+            method: "POST",
+            headers: {
+              "Authorization": "Bearer " + token
+            }
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    function safePlay() {
+      if (!audio) return;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          if (playBtn) playBtn.innerText = "⏸";
+        }).catch((error) => {
+          console.log("Playback interrupted safely:", error);
+          if (playBtn) playBtn.innerText = "▶";
+        });
+      }
+    }
+
+    function playSong(songOrIndex) {
+      const activeList = filteredSongs.length > 0 ? filteredSongs : songs;
+      if (activeList.length === 0) return;
+
+      if (typeof songOrIndex === "number") {
+        if (songOrIndex < 0 || songOrIndex >= activeList.length) return;
+        currentIndex = songOrIndex;
+        currentSong = activeList[songOrIndex];
+      } else {
+        currentSong = songOrIndex;
+        currentIndex = activeList.findIndex(
+          s => s.youtube_id === currentSong.youtube_id
+        );
+      }
+
+      lastPlayedHistory = null;
+      updatePlayerFavorite();
+
+      if (audio) {
+        audio.src = `/media/${currentSong.youtube_id}.mp3`;
+        safePlay();
+      }
+
+      // Update player UI elements if present
+      const coverEl = document.getElementById("current-cover");
+      if (coverEl) coverEl.src = `/media/${currentSong.youtube_id}.jpg`;
+
+      const titleEl = document.getElementById("song-name");
+      if (titleEl) titleEl.textContent = currentSong.filename.split("|").slice(1).join(" ") || currentSong.filename;
+
+      const artistEl = document.getElementById("artist-name");
+      if (artistEl) artistEl.textContent = currentSong.youtube_id;
+    }
+
+    function togglePlay() {
+      if (!audio) return;
+
+      if (!currentSong || !audio.src) {
+        const activeList = filteredSongs.length > 0 ? filteredSongs : songs;
+        if (activeList.length > 0) {
+          playSong(0);
+        } else {
+          alert("Please select a song first.");
+        }
+        return;
+      }
+
+      if (audio.paused) {
+        safePlay();
+      } else {
+        audio.pause();
+        if (playBtn) playBtn.innerText = "▶";
+      }
+    }
+
+    function nextSong() {
+      const activeList = filteredSongs.length > 0 ? filteredSongs : songs;
+      if (activeList.length === 0) return;
+
+      currentIndex++;
+      if (currentIndex >= activeList.length) {
+        currentIndex = 0;
+      }
+
+      playSong(currentIndex);
+    }
+
+    function prevSong() {
+      const activeList = filteredSongs.length > 0 ? filteredSongs : songs;
+      if (activeList.length === 0) return;
+
+      currentIndex--;
+      if (currentIndex < 0) {
+        currentIndex = activeList.length - 1;
+      }
+
+      playSong(currentIndex);
+    }
+
+    function randomSong() {
+      const activeList = filteredSongs.length > 0 ? filteredSongs : songs;
+      if (activeList.length === 0) {
+        console.error("No songs available for random selection");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * activeList.length);
+      playSong(randomIndex);
+    }
+
+    // ==========================================
+    // Keyboard Navigation & Shortcuts
+    // ==========================================
+    document.addEventListener("keydown", function (e) {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+        return;
+      }
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          togglePlay();
+          break;
+
+        case "ArrowRight":
+          nextSong();
+          break;
+
+        case "ArrowLeft":
+          prevSong();
+          break;
+
+        case "KeyF":
+          const searchInput = document.getElementById("search");
+          if (searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+          }
+          break;
+      }
+    });
+
+    // Helper Navigation Functions
+    function showDeleteCategory() {
+      window.location.href = '/manager';
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      if (menu) menu.classList.toggle("show");
+    }
+
+  </script>
 
 </body>
 

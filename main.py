@@ -109,3 +109,12 @@ def index(request: Request):
         {}
     )
     
+
+@app.get("/manager")
+def index(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "manager.html",
+        {}
+    )
+    

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Library</title>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #1f2937;
+        }
+
+        #song-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+
+        .song-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .song-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .song-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .delete-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Search Bar Component */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            width: 20px;
+            height: 20px;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .search {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            font-size: 16px;
+            color: #1f2937;
+            background-color: #f3f4f6;
+            border: 2px solid transparent;
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .search:focus {
+            background-color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #3b82f6;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-button:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Available Songs</h1>
+
+    <button id="delete-btn" class="delete-btn">
+        Delete Selected Songs
+    </button>
+
+    <form class="search-container" id="search-form">
+        <div class="search-wrapper">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input id="search" class="search" type="search" placeholder="Search for tracks, artists..."
+                aria-label="Search" oninput="filterSongs()">
+        </div>
+        <button type="submit" class="search-button">Search</button>
+    </form>
+
+    <ul id="song-list"></ul>
+
+    <script>
+        const API_URL = "http://velora";
+        const TOKEN = localStorage.getItem("token");
+        
+        let songs = [];
+        let filteredSongs = [];
+        
+        // Track selected song IDs globally so they survive search re-renders
+        const selectedSongIds = new Set();
+
+        // Fetch Songs
+        async function fetchSongs() {
+            try {
+                const response = await fetch(`${API_URL}/songs`, {
+                    headers: {
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load songs (${response.status})`);
+                }
+
+                songs = await response.json();
+                filteredSongs = [...songs];
+                renderSongs(filteredSongs);
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+            }
+        }
+
+        // Render Song Items
+        function renderSongs(songList) {
+            const list = document.getElementById("song-list");
+            list.innerHTML = "";
+
+            if (songList.length === 0) {
+                list.innerHTML = `<li style="padding: 20px; text-align: center; color: #6b7280;">No songs found.</li>`;
+                return;
+            }
+
+            songList.forEach(song => {
+                const li = document.createElement("li");
+                li.className = "song-item";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "song-checkbox";
+                checkbox.dataset.id = song.youtube_id;
+                
+                // RESTORE CHECKED STATE if ID is in the Set
+                checkbox.checked = selectedSongIds.has(song.youtube_id);
+
+                const img = document.createElement("img");
+                img.src = song.cover_url || `/media/${song.youtube_id}.jpg`;
+                img.alt = song.filename || "";
+                img.onerror = () => {
+                    img.src = "/media/default.jpg";
+                };
+
+                const details = document.createElement("div");
+                details.innerHTML = `
+                    <strong>Title:</strong> ${song.filename.split("|").slice(1).join(" ") || song.filename}<br>
+                    <small style="color: #6b7280;">ID: ${song.youtube_id}</small>
+                `;
+
+                li.appendChild(checkbox);
+                li.appendChild(img);
+                li.appendChild(details);
+
+                list.appendChild(li);
+            });
+        }
+
+        // Listen for Checkbox Toggle Events
+        document.getElementById("song-list").addEventListener("change", (e) => {
+            if (e.target.classList.contains("song-checkbox")) {
+                const songId = e.target.dataset.id;
+                if (e.target.checked) {
+                    selectedSongIds.add(songId);
+                } else {
+                    selectedSongIds.delete(songId);
+                }
+            }
+        });
+
+        // Search Filter
+        function filterSongs() {
+            const searchInput = document.getElementById("search");
+            if (!searchInput) return;
+
+            const q = searchInput.value.toLowerCase().trim();
+            filteredSongs = songs.filter(song =>
+                song.filename.toLowerCase().includes(q) ||
+                song.youtube_id.toLowerCase().includes(q)
+            );
+
+            renderSongs(filteredSongs);
+        }
+
+        // Prevent Form Submit Reloading the Page
+        document.getElementById("search-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            filterSongs();
+        });
+
+        // Delete Selected Songs
+        document.getElementById("delete-btn").addEventListener("click", async () => {
+            const btn = document.getElementById("delete-btn");
+
+            if (selectedSongIds.size === 0) {
+                alert("Select at least one song.");
+                return;
+            }
+
+            if (!confirm(`Delete ${selectedSongIds.size} song(s)?`)) {
+                return;
+            }
+
+            const youtube_ids = Array.from(selectedSongIds);
+
+            btn.disabled = true;
+            btn.textContent = "Deleting...";
+
+            try {
+                const response = await fetch(`${API_URL}/admin/delete`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${TOKEN}`
+                    },
+                    body: JSON.stringify({ youtube_ids })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || "Delete failed");
+                }
+
+                alert(result.message || "Deleted successfully!");
+
+                // Synchronize state arrays & clear selected set
+                songs = songs.filter(song => !selectedSongIds.has(song.youtube_id));
+                filteredSongs = filteredSongs.filter(song => !selectedSongIds.has(song.youtube_id));
+                selectedSongIds.clear();
+                
+                renderSongs(filteredSongs);
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Delete Selected Songs";
+            }
+        });
+
+        // Initial Fetch
+        fetchSongs();
+    </script>
+
+</body>
+
+</html>

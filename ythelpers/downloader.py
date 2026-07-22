@@ -273,7 +273,7 @@ def download_playlist(
 
             "outtmpl": os.path.join(
                 DOWNLOAD_DIR,
-                "%(title)s.%(ext)s",
+                "%(id)s.%(ext)s",
             ),
 
             "writethumbnail": True,
