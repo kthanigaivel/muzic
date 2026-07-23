@@ -41,8 +41,70 @@
             gap: 12px;
         }
 
+
+        /* Fixed Header & Menu Container at the Top */
+        .top-nav-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: green;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .header>h1 {
+            font-size: 30px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header>h1 img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .menu {
+            background-color: #ffffff;
+            padding: 5px 10px;
+        }
+
+        .menu ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            align-items: center;
+        }
+
+        .menu li {
+            padding: 6px 12px;
+            background-color: #33b5e5;
+            color: #ffffff;
+            white-space: nowrap;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu li:hover {
+            background-color: #0099cc;
+        }
+
+
         .container {
-            padding: 20px;
+            padding: 80px;
         }
 
         .grid {
@@ -119,18 +181,27 @@
 
 <body>
     <header>
-        <h2>📊 Velora Admin Dashboard</h2>
-        <div class="header-actions">
-            <button class="back" onclick="loadDashboard()">
-                🔄 Refresh
-            </button>
-            <button class="back" onclick="cleanupDownloads()">
-                🧹 Clean Downloads
-            </button>
-            <a href="/" class="back">
-                🏠 Home
-            </a>
+
+        <div class="top-nav-wrapper">
+            <div class="header">
+                <h1>
+                    <img id="profile-image" src="/static/images/music.png" alt="Velora Logo">
+                    📊 Velora Admin Dashboard
+                </h1>
+                <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
+            </div>
+
+            <div class="menu">
+                <ul>
+                    <li onclick="window.location.href='/';">🏠 Home</li>
+                    <li onclick="loadDashboard(); return false;">🔄 Refresh</li>
+                    <li onclick="cleanupDownloads(); return false;">🧹 Clean Downloads</li>
+                    <li onclick="window.location.href='/default';">👤 Profile</li>
+
+                </ul>
+            </div>
         </div>
+
     </header>
     <div class="container">
         <div class="grid">
@@ -310,7 +381,8 @@
             }
         }
     </script>
-    <audio id="dashboardPlayer" controls style="width:100%;position:fixed;bottom:0;left:0;background:#181818;color:#fff;padding:8px;z-index:9999;"></audio>
+    <audio id="dashboardPlayer" controls
+        style="width:100%;position:fixed;bottom:0;left:0;background:#181818;color:#fff;padding:8px;z-index:9999;"></audio>
 </body>
 
 </html>

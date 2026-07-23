@@ -15,6 +15,70 @@
             color: #1f2937;
         }
 
+
+
+
+        /* Fixed Header & Menu Container at the Top */
+        .top-nav-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: green;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .header>h1 {
+            font-size: 30px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header>h1 img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .menu {
+            background-color: #ffffff;
+            padding: 5px 10px;
+        }
+
+        .menu ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            align-items: center;
+        }
+
+        .menu li {
+            padding: 6px 12px;
+            background-color: #33b5e5;
+            color: #ffffff;
+            white-space: nowrap;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu li:hover {
+            background-color: #0099cc;
+        }
+
+
         #song-list {
             list-style: none;
             padding: 0;
@@ -51,12 +115,7 @@
             background: #ef4444;
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
             cursor: pointer;
-            margin-bottom: 20px;
-            font-size: 15px;
-            font-weight: 600;
             transition: background 0.2s;
         }
 
@@ -132,15 +191,42 @@
 
 <body>
 
+
+
+
+
+    <div class="top-nav-wrapper">
+        <div class="header">
+            <h1>
+                <img id="profile-image" src="/static/images/trash.png" alt="Trash Logo">
+                Velora Download Songs
+            </h1>
+            <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
+        </div>
+
+        <div class="menu">
+            <ul>
+                <li onclick="window.location.href='/';">🏠 Home</li>
+                <li onclick="window.location.href='/default';">👤 Profile</li>
+                <li>
+                    <button id="delete-btn" class="delete-btn">
+                        Delete Selected Songs
+                    </button>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+
     <h1>Available Songs</h1>
 
-    <button id="delete-btn" class="delete-btn">
-        Delete Selected Songs
-    </button>
+ 
 
     <form class="search-container" id="search-form">
         <div class="search-wrapper">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -155,10 +241,10 @@
     <script>
         const API_URL = "http://velora";
         const TOKEN = localStorage.getItem("token");
-        
+
         let songs = [];
         let filteredSongs = [];
-        
+
         // Track selected song IDs globally so they survive search re-renders
         const selectedSongIds = new Set();
 
@@ -204,7 +290,7 @@
                 checkbox.type = "checkbox";
                 checkbox.className = "song-checkbox";
                 checkbox.dataset.id = song.youtube_id;
-                
+
                 // RESTORE CHECKED STATE if ID is in the Set
                 checkbox.checked = selectedSongIds.has(song.youtube_id);
 
@@ -302,7 +388,7 @@
                 songs = songs.filter(song => !selectedSongIds.has(song.youtube_id));
                 filteredSongs = filteredSongs.filter(song => !selectedSongIds.has(song.youtube_id));
                 selectedSongIds.clear();
-                
+
                 renderSongs(filteredSongs);
 
             } catch (err) {

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Velora</title>
   <link rel="icon" type="image/x-icon" href="/static/images/music.png">
@@ -92,7 +93,7 @@
       grid-area: main;
     }
 
-    /* --- NEW SONG LIST STYLES --- */
+    /* Song List Styles */
     #song-list {
       list-style-type: none;
       padding: 0;
@@ -106,7 +107,6 @@
       padding: 10px;
       border-bottom: 1px solid #ccc;
       cursor: pointer;
-      /* Makes it clear you can click the song */
       transition: background 0.2s;
     }
 
@@ -122,21 +122,82 @@
       background-color: #eee;
     }
 
-    /* Floating Player Box */
+    /* ==========================================
+       FIXED SIZE PLAYER STYLES
+       ========================================== */
     .player {
       position: fixed;
-      bottom: 5px;
-      right: 5px;
-      max-width: 100%;
-      max-height: 40%;
-      border: 5px solid #0099cc;
-      background-color: beige;
-      padding: 15px;
+      bottom: 15px;
+      right: 15px;
+      width: 330px;            /* Fixed Width */
+      height: 210px;           /* Fixed Height */
+      border: 3px solid #0099cc;
+      background-color: #fdfbf7;
+      padding: 12px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      z-index: 100;
+      border-radius: 12px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
     }
 
+    .player-details {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .current-cover {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: #ddd;
+    }
+
+    .song-name {
+      flex: 1;
+      min-width: 0; /* Enables text truncation inside flexbox */
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player audio {
+      width: 100%;
+      height: 36px;
+      margin: 5px 0;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .controls .btn,
+    .controls #playerFavorite {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background: #ffffff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .controls .btn:hover,
+    .controls #playerFavorite:hover {
+      background: #e0e0e0;
+    }
 
     .footer {
       grid-area: footer;
@@ -144,8 +205,7 @@
       color: #ffffff;
       text-align: center;
       padding: 30px;
-      margin-bottom: 200px;
-      /* Adjusted to fit the player comfortably */
+      margin-bottom: 230px; /* Adjusted spacing for fixed player */
     }
 
     @media (min-width: 600px) {
@@ -176,31 +236,7 @@
       height: auto;
     }
 
-    .current-cover {
-      width: 120px;
-      height: 120px;
-      height: auto;
-      float: left;
-      margin: 3px;
-      padding: 3px;
-    }
-
-    .song-name {
-      container-type: inline-size;
-      width: 100%;
-      /* Or any fixed/flex width */
-    }
-
-    .song-name>* {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-
-      /* Font size automatically scales dynamically with container width */
-      font-size: clamp(14px, 4cqw, 24px);
-    }
-
-    /* Core wrapper using a fluid max-width */
+    /* Search Bar Component */
     .search-container {
       display: flex;
       align-items: center;
@@ -210,7 +246,6 @@
       font-family: system-ui, sans-serif;
     }
 
-    /* Input container that houses the icon and input field */
     .search-wrapper {
       position: relative;
       flex-grow: 1;
@@ -218,7 +253,6 @@
       align-items: center;
     }
 
-    /* Absolute positioned magnifying glass icon */
     .search-icon {
       position: absolute;
       left: 14px;
@@ -226,10 +260,8 @@
       height: 20px;
       color: #9ca3af;
       pointer-events: none;
-      /* Allows clicks to pass through to the input */
     }
 
-    /* Clean input field styling with space padding for the left icon */
     .search {
       width: 100%;
       padding: 12px 16px 12px 44px;
@@ -238,20 +270,16 @@
       background-color: #f3f4f6;
       border: 2px solid transparent;
       border-radius: 30px;
-      /* Pill-shaped design */
       outline: none;
       transition: all 0.2s ease-in-out;
     }
 
-    /* Accessible focus effect that tints background and applies a border */
-    .search-input:focus {
+    .search:focus {
       background-color: #ffffff;
       border-color: #3b82f6;
-      /* Modern blue highlight */
       box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
 
-    /* Call-to-action submit button */
     .search-button {
       padding: 12px 24px;
       font-size: 16px;
@@ -266,7 +294,6 @@
 
     .search-button:hover {
       background-color: #2563eb;
-      /* Slightly darker blue on hover */
     }
   </style>
 </head>
@@ -279,7 +306,7 @@
         <img id="profile-image" src="/static/images/music.png" alt="Velora Logo">
         Velora
       </h1>
-      <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
+      <span id="profile-name" style="display:none;"></span>
     </div>
 
     <div class="menu">
@@ -288,10 +315,6 @@
         <li onclick="showFavorites(); return false;">❤️ Favorites</li>
         <li onclick="showShuffle(); return false;">🔀 Shuffle</li>
         <li onclick="window.location.href='/default';">👤 Profile</li>
-        <li onclick="window.location.href='/dash';">📊 Dashboard</li>
-        <li onclick="window.location.href='/download';">🎵 Fetch</li>
-        <li onclick="window.location.href='/manager';">🗑 Remove Songs</li>
-        <li onclick="logout(); return false;">💥 Logout</li>
       </ul>
     </div>
   </div>
@@ -299,15 +322,13 @@
   <div class="grid-container">
     <div class="content">
 
-
-      <form class="search-container">
+      <form class="search-container" onsubmit="event.preventDefault(); filterSongs();">
         <div class="search-wrapper">
-          <!-- SVG magnifying glass icon -->
-          <svg class="search-icon" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input id="search" class="search" type="search"   placeholder="Search for tracks, artists..." aria-label="Search"
+          <input id="search" class="search" type="search" placeholder="Search for tracks, artists..." aria-label="Search"
             onkeyup="filterSongs()">
         </div>
         <button type="submit" class="search-button">Search</button>
@@ -315,31 +336,27 @@
 
       <ul id="song-list"></ul>
     </div>
+
     <div class="footer">
       <p>&copy; 2026 Velora. All rights to Thanigaivel K.</p>
     </div>
   </div>
 
+  <!-- FIXED SIZE PLAYER CONTAINER -->
   <div class="player">
+    <div class="player-details">
+      <img id="current-cover" class="current-cover" src="/static/images/default-cover.png" alt="Cover">
+      <div id="song-name" class="song-name">Welcome to Velora</div>
+    </div>
 
-    <audio id="player" controls>
-    </audio>
+    <audio id="player" controls></audio>
 
-    <div class="controls" style="margin-top: 15px; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">
+    <div class="controls">
       <button class="btn" onclick="prevSong()">⏮ Prev</button>
       <button class="btn" onclick="togglePlay()" id="playBtn">▶ Play</button>
       <button class="btn" onclick="nextSong()">Next ⏭</button>
-      <button id="playerFavorite" onclick="toggleCurrentFavorite()">
-        🤍
-      </button>
+      <button id="playerFavorite" onclick="toggleCurrentFavorite()">🤍</button>
     </div>
-    <br>
-    <img id="current-cover" class="current-cover" src="/static/images/default-cover.jpg">
-    <div id="song-name" class="song-name">Welcome to Velora
-
-    </div>
-
-
   </div>
 
   <script>
@@ -347,11 +364,6 @@
     // Global State & Configuration
     // ==========================================
     const TOKEN = localStorage.getItem("token");
-
-    if (!TOKEN) {
-      // Redirect if unauthenticated (uncomment in production)
-      // window.location.href = "/default";
-    }
 
     function getToken() {
       return localStorage.getItem("token");
@@ -463,20 +475,6 @@
       greetingEl.textContent = `${greeting}${name}`;
     }
 
-    function toggleProfile() {
-      const menu = document.getElementById("profile-menu");
-      if (menu) menu.classList.toggle("show");
-    }
-
-    window.addEventListener("click", function (e) {
-      const profile = document.querySelector(".profile");
-      const menu = document.getElementById("profile-menu");
-
-      if (profile && menu && !profile.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
-
     function logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("access_token");
@@ -583,35 +581,15 @@
         return;
       }
 
-      // 1. Support Card Grid Container (#songs)
-      const container = document.getElementById("songs");
-      if (container) {
-        container.innerHTML = songList.map((song, index) => `
-            <div class="song-card" onclick="playSong(${index})">
-                <div class="cover">
-                    <img src="${song.cover_url || `/media/${song.youtube_id}.jpg`}" alt="Cover" onerror="this.src='/media/default.jpg'">
-                </div>
-                <div class="song-overlay">
-                    <div class="song-info">
-                        <div class="song-title">
-                            ${song.filename.split("|").slice(1).join(" ") || song.filename}
-                        </div>
-                        <div class="song-artist">
-                            ${song.youtube_id}
-                        </div>
-                    </div>
-                    <div class="favorite" onclick="event.stopPropagation(); toggleFavorite('${song.youtube_id}')">
-                        ${favorites.has(song.youtube_id) ? "❤️" : "🤍"}
-                    </div>
-                </div>
-            </div>
-        `).join("");
-      }
-
-      // 2. Support List Container (#song-list)
       const listContainer = document.getElementById("song-list");
       if (listContainer) {
         listContainer.innerHTML = "";
+        
+        if (songList.length === 0) {
+          listContainer.innerHTML = `<li style="padding: 20px; text-align: center; color: #777;">No songs available.</li>`;
+          return;
+        }
+
         songList.forEach((song, index) => {
           const li = document.createElement("li");
           li.className = "song-item";
@@ -620,7 +598,7 @@
           const img = document.createElement("img");
           img.src = song.cover_url || `/media/${song.youtube_id}.jpg`;
           img.alt = song.filename || "";
-          img.onerror = () => { img.src = "/media/default.jpg"; };
+          img.onerror = () => { img.src = "/static/images/default-cover.png"; };
 
           const details = document.createElement("div");
           details.style.flex = "1";
@@ -730,25 +708,6 @@
       if (muted !== null) {
         audio.muted = muted === "true";
       }
-
-      audio.addEventListener("playing", async () => {
-        if (!currentSong) return;
-        if (lastPlayedHistory === currentSong.youtube_id) return;
-
-        lastPlayedHistory = currentSong.youtube_id;
-
-        try {
-          const token = getToken();
-          await fetch("/songs/play?youtube_id=" + currentSong.youtube_id, {
-            method: "POST",
-            headers: {
-              "Authorization": "Bearer " + token
-            }
-          });
-        } catch (err) {
-          console.error(err);
-        }
-      });
     }
 
     function safePlay() {
@@ -787,15 +746,12 @@
         safePlay();
       }
 
-      // Update player UI elements if present
+      // Update player UI elements
       const coverEl = document.getElementById("current-cover");
       if (coverEl) coverEl.src = `/media/${currentSong.youtube_id}.jpg`;
 
       const titleEl = document.getElementById("song-name");
       if (titleEl) titleEl.textContent = currentSong.filename.split("|").slice(1).join(" ") || currentSong.filename;
-
-      const artistEl = document.getElementById("artist-name");
-      if (artistEl) artistEl.textContent = currentSong.youtube_id;
     }
 
     function togglePlay() {
@@ -843,20 +799,7 @@
       playSong(currentIndex);
     }
 
-    function randomSong() {
-      const activeList = filteredSongs.length > 0 ? filteredSongs : songs;
-      if (activeList.length === 0) {
-        console.error("No songs available for random selection");
-        return;
-      }
-
-      const randomIndex = Math.floor(Math.random() * activeList.length);
-      playSong(randomIndex);
-    }
-
-    // ==========================================
-    // Keyboard Navigation & Shortcuts
-    // ==========================================
+    // Keyboard Shortcuts
     document.addEventListener("keydown", function (e) {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
         return;
@@ -885,17 +828,6 @@
           break;
       }
     });
-
-    // Helper Navigation Functions
-    function showDeleteCategory() {
-      window.location.href = '/manager';
-    }
-
-    function toggleMenu() {
-      const menu = document.getElementById("menu");
-      if (menu) menu.classList.toggle("show");
-    }
-
   </script>
 
 </body>

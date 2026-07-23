@@ -14,11 +14,94 @@
             margin: 0;
         }
 
+        header {
+            padding: 20px;
+            background: #181818;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+
+        /* Fixed Header & Menu Container at the Top */
+        .top-nav-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: green;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .header>h1 {
+            font-size: 30px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header>h1 img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .menu {
+            background-color: #ffffff;
+            padding: 5px 10px;
+        }
+
+        .menu ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            align-items: center;
+        }
+
+        .menu li {
+            padding: 6px 12px;
+            background-color: #33b5e5;
+            color: #ffffff;
+            white-space: nowrap;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu li:hover {
+            background-color: #0099cc;
+        }
+
+
         .container {
-            max-width: 700px;
-            margin: 40px auto;
+            max-width: 100%;
+            margin: 80px auto;
             background: #fff;
-            padding: 25px;
+            padding: 150px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, .15);
         }
@@ -76,6 +159,27 @@
 <body>
 
     <div class="container">
+
+
+
+
+        <div class="top-nav-wrapper">
+            <div class="header">
+                <h1>
+                    <img id="profile-image" src="/static/images/icons8-download-100.png" alt="Velora Logo">
+                    Velora Download Songs
+                </h1>
+                <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
+            </div>
+
+            <div class="menu">
+                <ul>
+                    <li onclick="window.location.href='/';">🏠 Home</li>
+                    <li onclick="window.location.href='/default';">👤 Profile</li>
+
+                </ul>
+            </div>
+        </div>
 
         <h2>YouTube Downloader</h2>
 
