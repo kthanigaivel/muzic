@@ -4,55 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Library</title>
+    <title>Velora - Song Manager</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/music.png">
 
     <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            color: #1f2937;
+        * {
+            box-sizing: border-box;
         }
 
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding-top: 90px;
+            min-height: 100vh;
+        }
 
-
-
-        /* Fixed Header & Menu Container at the Top */
+        /* ==========================================
+           FIXED TOP NAVIGATION MENU STYLES
+           ========================================== */
         .top-nav-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: white;
+            background-color: #181818;
+            border-bottom: 1px solid #282828;
             z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
         }
 
-        .header {
-            background-color: green;
-            text-align: center;
+        .header h1 {
+            margin: 0;
+            font-size: 1.3rem;
             color: #ffffff;
-        }
-
-        .header>h1 {
-            font-size: 30px;
-            margin: 10px 0;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
         }
 
-        .header>h1 img {
-            width: 32px;
-            height: 32px;
+        .header h1 img {
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
         .menu {
-            background-color: #ffffff;
-            padding: 5px 10px;
+            display: flex;
+            align-items: center;
         }
 
         .menu ul {
@@ -60,63 +64,63 @@
             margin: 0;
             padding: 0;
             display: flex;
-            gap: 5px;
-            overflow-x: auto;
+            gap: 8px;
             align-items: center;
         }
 
         .menu li {
-            padding: 6px 12px;
-            background-color: #33b5e5;
+            padding: 8px 16px;
+            background-color: #282828;
             color: #ffffff;
             white-space: nowrap;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
         }
 
         .menu li:hover {
-            background-color: #0099cc;
+            background-color: #1DB954;
+            color: #000000;
         }
 
-
-        #song-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
+        /* ==========================================
+           PAGE CONTENT CONTAINER
+           ========================================== */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px 60px 20px;
         }
 
-        .song-item {
+        .action-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
             gap: 15px;
-            padding: 12px;
-            border-bottom: 1px solid #e5e7eb;
-            transition: background-color 0.2s;
+            margin-bottom: 20px;
         }
 
-        .song-item:hover {
-            background-color: #f9fafb;
+        .action-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #ffffff;
         }
 
-        .song-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .song-item img {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
+        /* Delete Button */
         .delete-btn {
             background: #ef4444;
-            color: white;
+            color: #ffffff;
             border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s ease, opacity 0.2s;
         }
 
         .delete-btn:hover {
@@ -124,8 +128,9 @@
         }
 
         .delete-btn:disabled {
-            background: #9ca3af;
+            background: #4b5563;
             cursor: not-allowed;
+            opacity: 0.6;
         }
 
         /* Search Bar Component */
@@ -156,27 +161,25 @@
         .search {
             width: 100%;
             padding: 12px 16px 12px 44px;
-            font-size: 16px;
-            color: #1f2937;
-            background-color: #f3f4f6;
-            border: 2px solid transparent;
+            font-size: 15px;
+            color: #ffffff;
+            background-color: #1e1e1e;
+            border: 1px solid #333333;
             border-radius: 30px;
             outline: none;
-            transition: all 0.2s ease-in-out;
+            transition: border-color 0.2s ease-in-out;
         }
 
         .search:focus {
-            background-color: #ffffff;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            border-color: #1DB954;
         }
 
         .search-button {
             padding: 12px 24px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            color: #ffffff;
-            background-color: #3b82f6;
+            color: #000000;
+            background-color: #1DB954;
             border: none;
             border-radius: 30px;
             cursor: pointer;
@@ -184,79 +187,163 @@
         }
 
         .search-button:hover {
-            background-color: #2563eb;
+            background-color: #1ed760;
+        }
+
+        /* Song List Component */
+        #song-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            background: #1e1e1e;
+            border: 1px solid #282828;
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .song-item:hover {
+            background-color: #252525;
+        }
+
+        .song-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #1DB954;
+        }
+
+        .song-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            object-fit: cover;
+            background-color: #282828;
+        }
+
+        .song-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .song-details strong {
+            display: block;
+            font-size: 15px;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-details small {
+            color: #888888;
+            font-size: 13px;
+        }
+
+        /* Responsive Layout Adjustments */
+        @media (max-width: 680px) {
+            body {
+                padding-top: 130px;
+            }
+
+            .top-nav-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .menu {
+                width: 100%;
+            }
+
+            .menu ul {
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 4px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-
-
-
-
+    <!-- FIXED TOP NAVIGATION BAR -->
     <div class="top-nav-wrapper">
         <div class="header">
             <h1>
-                <img id="profile-image" src="/static/images/trash.png" alt="Trash Logo">
-                Velora Download Songs
+                <img id="profile-image" src="/static/images/trash.png" alt="Trash Logo" onerror="this.src='/static/images/music.png'">
+                Velora Song Manager
             </h1>
-            <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
         </div>
 
-        <div class="menu">
+        <nav class="menu">
             <ul>
                 <li onclick="window.location.href='/';">🏠 Home</li>
+                <li onclick="window.location.href='/dash';">📊 Dashboard</li>
+                <li onclick="window.location.href='/download';">🎵 Fetch</li>
                 <li onclick="window.location.href='/default';">👤 Profile</li>
-                <li>
-                    <button id="delete-btn" class="delete-btn">
-                        Delete Selected Songs
-                    </button>
-                </li>
-
             </ul>
-        </div>
+        </nav>
     </div>
 
-
-    <h1>Available Songs</h1>
-
- 
-
-    <form class="search-container" id="search-form">
-        <div class="search-wrapper">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input id="search" class="search" type="search" placeholder="Search for tracks, artists..."
-                aria-label="Search" oninput="filterSongs()">
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        
+        <div class="action-header">
+            <h2>Available Songs</h2>
+            <button id="delete-btn" class="delete-btn">
+                🗑 Delete Selected Songs
+            </button>
         </div>
-        <button type="submit" class="search-button">Search</button>
-    </form>
 
-    <ul id="song-list"></ul>
+        <form class="search-container" id="search-form">
+            <div class="search-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input id="search" class="search" type="search" placeholder="Search for tracks, artists..."
+                    aria-label="Search" oninput="filterSongs()">
+            </div>
+            <button type="submit" class="search-button">Search</button>
+        </form>
+
+        <ul id="song-list"></ul>
+    </div>
 
     <script>
-        const API_URL = "http://velora";
         const TOKEN = localStorage.getItem("token");
 
         let songs = [];
         let filteredSongs = [];
 
-        // Track selected song IDs globally so they survive search re-renders
+        // Global set to retain selections across search filters
         const selectedSongIds = new Set();
 
-        // Fetch Songs
+        // Fetch Songs from API
         async function fetchSongs() {
             try {
-                const response = await fetch(`${API_URL}/songs`, {
+                const response = await fetch(`/songs`, {
                     headers: {
                         "Accept": "application/json",
                         "Authorization": `Bearer ${TOKEN}`
                     }
                 });
+
+                if (response.status === 401) {
+                    window.location.href = "/default";
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error(`Failed to load songs (${response.status})`);
@@ -272,13 +359,13 @@
             }
         }
 
-        // Render Song Items
+        // Render Song List
         function renderSongs(songList) {
             const list = document.getElementById("song-list");
             list.innerHTML = "";
 
             if (songList.length === 0) {
-                list.innerHTML = `<li style="padding: 20px; text-align: center; color: #6b7280;">No songs found.</li>`;
+                list.innerHTML = `<li style="padding: 30px; text-align: center; color: #888888;">No songs found.</li>`;
                 return;
             }
 
@@ -291,20 +378,21 @@
                 checkbox.className = "song-checkbox";
                 checkbox.dataset.id = song.youtube_id;
 
-                // RESTORE CHECKED STATE if ID is in the Set
+                // Restore checked state if ID exists in Set
                 checkbox.checked = selectedSongIds.has(song.youtube_id);
 
                 const img = document.createElement("img");
                 img.src = song.cover_url || `/media/${song.youtube_id}.jpg`;
                 img.alt = song.filename || "";
                 img.onerror = () => {
-                    img.src = "/media/default.jpg";
+                    img.src = "/static/images/default-cover.png";
                 };
 
                 const details = document.createElement("div");
+                details.className = "song-details";
                 details.innerHTML = `
-                    <strong>Title:</strong> ${song.filename.split("|").slice(1).join(" ") || song.filename}<br>
-                    <small style="color: #6b7280;">ID: ${song.youtube_id}</small>
+                    <strong>${song.filename.split("|").slice(1).join(" ") || song.filename}</strong>
+                    <small>ID: ${song.youtube_id}</small>
                 `;
 
                 li.appendChild(checkbox);
@@ -315,7 +403,7 @@
             });
         }
 
-        // Listen for Checkbox Toggle Events
+        // Handle Checkbox Selection
         document.getElementById("song-list").addEventListener("change", (e) => {
             if (e.target.classList.contains("song-checkbox")) {
                 const songId = e.target.dataset.id;
@@ -327,7 +415,7 @@
             }
         });
 
-        // Search Filter
+        // Filter Songs Function
         function filterSongs() {
             const searchInput = document.getElementById("search");
             if (!searchInput) return;
@@ -341,22 +429,22 @@
             renderSongs(filteredSongs);
         }
 
-        // Prevent Form Submit Reloading the Page
+        // Prevent Page Reload on Search Form Submit
         document.getElementById("search-form").addEventListener("submit", (e) => {
             e.preventDefault();
             filterSongs();
         });
 
-        // Delete Selected Songs
+        // Delete Selected Songs Action
         document.getElementById("delete-btn").addEventListener("click", async () => {
             const btn = document.getElementById("delete-btn");
 
             if (selectedSongIds.size === 0) {
-                alert("Select at least one song.");
+                alert("Select at least one song to delete.");
                 return;
             }
 
-            if (!confirm(`Delete ${selectedSongIds.size} song(s)?`)) {
+            if (!confirm(`Are you sure you want to delete ${selectedSongIds.size} selected song(s)?`)) {
                 return;
             }
 
@@ -366,7 +454,7 @@
             btn.textContent = "Deleting...";
 
             try {
-                const response = await fetch(`${API_URL}/admin/delete`, {
+                const response = await fetch(`/admin/delete`, {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
@@ -384,7 +472,7 @@
 
                 alert(result.message || "Deleted successfully!");
 
-                // Synchronize state arrays & clear selected set
+                // Remove deleted songs from local state
                 songs = songs.filter(song => !selectedSongIds.has(song.youtube_id));
                 filteredSongs = filteredSongs.filter(song => !selectedSongIds.has(song.youtube_id));
                 selectedSongIds.clear();
@@ -396,11 +484,11 @@
                 alert(err.message);
             } finally {
                 btn.disabled = false;
-                btn.textContent = "Delete Selected Songs";
+                btn.textContent = "🗑 Delete Selected Songs";
             }
         });
 
-        // Initial Fetch
+        // Initialize Fetch
         fetchSongs();
     </script>
 

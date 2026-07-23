@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velora</title>
+    <title>Velora - Account</title>
     <link rel="icon" type="image/x-icon" href="/static/images/music.png">
 
     <style>
@@ -12,47 +13,54 @@
         }
 
         body {
-            font-family: "Lucida Sans", sans-serif;
-            font-size: 17px;
+            font-family: "Lucida Sans", Arial, sans-serif;
+            font-size: 16px;
             margin: 0;
-            padding-top: 130px;
+            background-color: #121212;
+            color: #ffffff;
+            padding-top: 90px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Fixed Header & Menu Container at the Top */
+        /* ==========================================
+           FIXED TOP NAVIGATION MENU STYLES
+           ========================================== */
         .top-nav-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: white;
+            background-color: #181818;
+            border-bottom: 1px solid #282828;
             z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
         }
 
-        .header {
-            background-color: green;
-            text-align: center;
+        .header h1 {
+            margin: 0;
+            font-size: 1.3rem;
             color: #ffffff;
-        }
-
-        .header>h1 {
-            font-size: 30px;
-            margin: 10px 0;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
         }
 
-        .header>h1 img {
-            width: 32px;
-            height: 32px;
+        .header h1 img {
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
         .menu {
-            background-color: #ffffff;
-            padding: 5px 10px;
+            display: flex;
+            align-items: center;
         }
 
         .menu ul {
@@ -60,244 +68,355 @@
             margin: 0;
             padding: 0;
             display: flex;
-            gap: 5px;
-            overflow-x: auto;
+            gap: 8px;
             align-items: center;
         }
 
         .menu li {
-            padding: 6px 12px;
-            background-color: #33b5e5;
+            padding: 8px 16px;
+            background-color: #282828;
             color: #ffffff;
             white-space: nowrap;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
         }
 
         .menu li:hover {
-            background-color: #0099cc;
+            background-color: #1DB954;
+            color: #000000;
         }
 
-
+        /* ==========================================
+           CARD & AUTH CONTAINER STYLES
+           ========================================== */
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 20px
+            padding: 20px;
+            margin: auto 0;
         }
 
         .card {
-            background: #53a17f;
+            background: #1e1e1e;
+            border: 1px solid #282828;
             border-radius: 18px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .5)
+            padding: 35px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .logo {
             color: #1DB954;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 20px
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 10px
+            margin: 0 0 8px 0;
+            color: #ffffff;
         }
 
         .subtitle {
             text-align: center;
             color: #b3b3b3;
-            margin-bottom: 30px
+            font-size: 14px;
+            margin-bottom: 25px;
         }
 
         .view {
-            display: none
+            display: none;
         }
 
         .view.active {
-            display: block
+            display: block;
         }
 
         input {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 18px;
-            border: none;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid #333;
             border-radius: 10px;
             background: #282828;
-            color: #fff
+            color: #fff;
+            font-size: 15px;
+            transition: border-color 0.2s;
         }
 
         input:focus {
-            outline: 2px solid #1DB954
+            outline: none;
+            border-color: #1DB954;
         }
 
         button {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border: none;
             border-radius: 30px;
             background: #1DB954;
-            color: #fff;
+            color: #000;
+            font-size: 16px;
             font-weight: bold;
-            cursor: pointer
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            background: #1ed760;
         }
 
         button:disabled {
-            opacity: .6
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         #status {
             margin-top: 15px;
             text-align: center;
-            min-height: 22px
+            min-height: 22px;
+            font-size: 14px;
         }
 
         .success {
-            color: #1DB954
+            color: #1DB954;
         }
 
         .error {
-            color: #ff6666
+            color: #ff6666;
         }
 
         .register {
             text-align: center;
             margin-top: 20px;
-            color: #b3b3b3
+            color: #b3b3b3;
+            font-size: 14px;
         }
 
         .register a {
             color: #1DB954;
-            text-decoration: none
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .register a:hover {
+            text-decoration: underline;
         }
 
         #profileView p {
-            margin: 15px 0
+            margin: 15px 0;
+            font-size: 15px;
+            color: #ddd;
+            word-break: break-all;
+        }
+
+        #profileView p strong {
+            color: #fff;
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 680px) {
+            body {
+                padding-top: 130px;
+            }
+
+            .top-nav-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .menu {
+                width: 100%;
+            }
+
+            .menu ul {
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 4px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-
-
+    <!-- FIXED TOP NAVIGATION BAR -->
     <div class="top-nav-wrapper">
         <div class="header">
             <h1>
                 <img id="profile-image" src="/static/images/music.png" alt="Velora Logo">
                 Velora
             </h1>
- 
-
-
-            <div class="menu">
-                <ul>
-                    <li onclick="window.location.href='/';">🏠 Home</li>
-                    <li onclick="window.location.href='/dash';">📊 Dashboard</li>
-                    <li onclick="window.location.href='/download';">🎵 Fetch</li>
-                    <li onclick="window.location.href='/manager';">🗑 Remove Songs</li>
-                </ul>
-            </div>
-
         </div>
+
+        <nav class="menu">
+            <ul>
+                <li onclick="window.location.href='/';">🏠 Home</li>
+                <li onclick="window.location.href='/dash';">📊 Dashboard</li>
+                <li onclick="window.location.href='/download';">🎵 Fetch</li>
+                <li onclick="window.location.href='/manager';">🗑 Remove Songs</li>
+            </ul>
+        </nav>
     </div>
 
-
-
-
-
+    <!-- AUTHENTICATION & PROFILE CONTAINER -->
     <div class="container">
         <div class="card">
-            <div class="logo">🎵 MUZIC</div>
+            <div class="logo">🎵 VELORA</div>
+
+            <!-- LOGIN / REGISTER VIEW -->
             <div id="authView" class="view active">
                 <h2 id="formTitle">Login</h2>
-                <p class="subtitle" id="subtitle">Welcome back to Muzic</p>
+                <p class="subtitle" id="subtitle">Welcome back to Velora</p>
+
                 <input id="username" placeholder="Username">
                 <input id="email" type="email" placeholder="Email" style="display:none">
                 <input id="password" type="password" placeholder="Password">
+
                 <button id="mainBtn">Login</button>
                 <div id="status"></div>
-                <p class="register"><span id="switchText">Don't have an account?</span> <a href="#" id="switch"><span
-                            id="modeText">Register</span></a></p>
+
+                <p class="register">
+                    <span id="switchText">Don't have an account?</span> 
+                    <a href="#" id="switch"><span id="modeText">Register</span></a>
+                </p>
             </div>
+
+            <!-- PROFILE VIEW -->
             <div id="profileView" class="view">
                 <h2>Your Profile</h2>
-
                 <p><strong>Username:</strong> <span id="profUser"></span></p>
                 <p><strong>Email:</strong> <span id="profEmail"></span></p>
 
-
-
-                <button id="logoutBtn" style="margin-top:15px;background:#ff4d4d;">
+                <button id="logoutBtn" style="margin-top:20px; background:#ff4d4d; color:#ffffff;">
                     Logout
                 </button>
             </div>
-
-
         </div>
     </div>
+
     <script>
         const API_URL = window.location.origin;
         let isLogin = true;
+
         const $ = id => document.getElementById(id);
-        function show(m, e = false) { const s = $("status"); s.innerText = m; s.className = e ? "error" : "success"; }
+
+        function show(m, e = false) { 
+            const s = $("status"); 
+            s.innerText = m; 
+            s.className = e ? "error" : "success"; 
+        }
+
         function toggleMode() {
             isLogin = !isLogin;
             $("formTitle").innerText = isLogin ? "Login" : "Create Account";
-            $("subtitle").innerText = isLogin ? "Welcome back to Muzic" : "Create your Muzic account";
+            $("subtitle").innerText = isLogin ? "Welcome back to Velora" : "Create your Velora account";
             $("mainBtn").innerText = isLogin ? "Login" : "Register";
             $("modeText").innerText = isLogin ? "Register" : "Login";
             $("switchText").innerText = isLogin ? "Don't have an account?" : "Already have an account?";
             $("email").style.display = isLogin ? "none" : "block";
             $("username").placeholder = isLogin ? "Username" : "Choose a username";
             $("password").placeholder = isLogin ? "Password" : "Create a password";
-            $("username").value = ""; $("email").value = ""; $("password").value = ""; show("");
+            $("username").value = ""; 
+            $("email").value = ""; 
+            $("password").value = ""; 
+            show("");
         }
+
         $("switch").onclick = (e) => { e.preventDefault(); toggleMode(); }
-        $("mainBtn").onclick = handleAuth; $("logoutBtn").onclick = logout;
-        document.addEventListener("keydown", e => { if (e.key === "Enter" && $("authView").classList.contains("active")) handleAuth(); });
+        $("mainBtn").onclick = handleAuth; 
+        $("logoutBtn").onclick = logout;
+
+        document.addEventListener("keydown", e => { 
+            if (e.key === "Enter" && $("authView").classList.contains("active")) handleAuth(); 
+        });
+
         async function handleAuth() {
             const d = { username: $("username").value.trim(), password: $("password").value };
             if (!d.username || !d.password) return show("Username and password required", true);
-            if (!isLogin) { d.email = $("email").value.trim(); if (!d.email) return show("Email required", true); }
-            const b = $("mainBtn"); b.disabled = true; b.textContent = isLogin ? "Logging in..." : "Registering...";
+            if (!isLogin) { 
+                d.email = $("email").value.trim(); 
+                if (!d.email) return show("Email required", true); 
+            }
+
+            const b = $("mainBtn"); 
+            b.disabled = true; 
+            b.textContent = isLogin ? "Logging in..." : "Registering...";
+
             try {
-                const r = await fetch(API_URL + (isLogin ? "/auth/login" : "/auth/register"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
+                const r = await fetch(API_URL + (isLogin ? "/auth/login" : "/auth/register"), { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify(d) 
+                });
+
                 const j = await r.json().catch(() => ({}));
                 if (!r.ok) throw new Error(j.detail || "Request failed");
+
                 if (isLogin) {
                     localStorage.setItem("token", j.access_token);
-
                     show("Login successful! Redirecting...");
-
                     await showProfile();
 
                     setTimeout(() => {
                         window.location.href = API_URL;
-                    }, 0);
-                } else { show("Registration successful"); toggleMode(); }
+                    }, 500);
+                } else { 
+                    show("Registration successful"); 
+                    toggleMode(); 
+                }
             }
-            catch (err) { show(err.message || "Server error", true) }
-            finally { b.disabled = false; b.textContent = isLogin ? "Login" : "Register"; }
+            catch (err) { 
+                show(err.message || "Server error", true); 
+            }
+            finally { 
+                b.disabled = false; 
+                b.textContent = isLogin ? "Login" : "Register"; 
+            }
         }
+
         async function showProfile() {
-            const t = localStorage.getItem("token"); if (!t) return;
+            const t = localStorage.getItem("token"); 
+            if (!t) return;
+
             try {
-                const r = await fetch(API_URL + "/auth/me", { headers: { Authorization: `Bearer ${t}` } });
-                if (!r.ok) throw Error(); const u = await r.json(); $("authView").classList.remove("active"); $("profileView").classList.add("active"); $("profUser").textContent = u.username; $("profEmail").textContent = u.email;
+                const r = await fetch(API_URL + "/auth/me", { 
+                    headers: { Authorization: `Bearer ${t}` } 
+                });
+                if (!r.ok) throw Error(); 
+
+                const u = await r.json(); 
+                $("authView").classList.remove("active"); 
+                $("profileView").classList.add("active"); 
+                $("profUser").textContent = u.username; 
+                $("profEmail").textContent = u.email;
             }
-            catch { localStorage.removeItem("token"); }
+            catch { 
+                localStorage.removeItem("token"); 
+            }
         }
-        function logout() { if (confirm("Logout?")) { localStorage.removeItem("token"); location.reload(); } }
-        window.onload = () => { if (localStorage.getItem("token")) showProfile(); }
 
-        $("homeBtn").onclick = () => {
-            window.location.href = API_URL;
-        };
+        function logout() { 
+            if (confirm("Logout?")) { 
+                localStorage.removeItem("token"); 
+                location.reload(); 
+            } 
+        }
 
-
+        window.onload = () => { 
+            if (localStorage.getItem("token")) showProfile(); 
+        }
     </script>
 </body>
 

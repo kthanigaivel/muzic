@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velora</title>
+  <title>Velora - Music Library</title>
   <link rel="icon" type="image/x-icon" href="/static/images/music.png">
   <style>
     * {
@@ -12,47 +12,51 @@
     }
 
     body {
-      font-family: "Lucida Sans", sans-serif;
-      font-size: 17px;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      background-color: #121212;
+      color: #ffffff;
       margin: 0;
-      padding-top: 130px;
+      padding-top: 90px;
+      min-height: 100vh;
     }
 
-    /* Fixed Header & Menu Container at the Top */
+    /* ==========================================
+       FIXED TOP NAVIGATION MENU STYLES
+       ========================================== */
     .top-nav-wrapper {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      background-color: white;
+      background-color: #181818;
+      border-bottom: 1px solid #282828;
       z-index: 1000;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
     }
 
-    .header {
-      background-color: green;
-      text-align: center;
+    .header h1 {
+      margin: 0;
+      font-size: 1.3rem;
       color: #ffffff;
-    }
-
-    .header>h1 {
-      font-size: 30px;
-      margin: 10px 0;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 10px;
     }
 
-    .header>h1 img {
-      width: 32px;
-      height: 32px;
+    .header h1 img {
+      width: 30px;
+      height: 30px;
       object-fit: contain;
     }
 
     .menu {
-      background-color: #ffffff;
-      padding: 5px 10px;
+      display: flex;
+      align-items: center;
     }
 
     .menu ul {
@@ -60,190 +64,80 @@
       margin: 0;
       padding: 0;
       display: flex;
-      gap: 5px;
-      overflow-x: auto;
+      gap: 8px;
       align-items: center;
     }
 
     .menu li {
-      padding: 6px 12px;
-      background-color: #33b5e5;
+      padding: 8px 16px;
+      background-color: #282828;
       color: #ffffff;
       white-space: nowrap;
-      border-radius: 4px;
+      border-radius: 20px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      user-select: none;
     }
 
     .menu li:hover {
-      background-color: #0099cc;
-    }
-
-    .grid-container {
-      display: grid;
-      grid-template-areas:
-        'main'
-        'footer';
-      background-color: white;
-      gap: 10px;
-      padding: 10px;
-      min-height: 100vh;
-    }
-
-    .content {
-      grid-area: main;
-    }
-
-    /* Song List Styles */
-    #song-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .song-item {
-      display: flex;
-      align-items: center;
-      gap: 30px;
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .song-item:hover {
-      background-color: #f0f0f0;
-    }
-
-    .song-item img {
-      width: 180px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 8px;
-      background-color: #eee;
+      background-color: #1DB954;
+      color: #000000;
     }
 
     /* ==========================================
-       FIXED SIZE PLAYER STYLES
+       MAIN LAYOUT & CONTENT
        ========================================== */
-    .player {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      width: 330px;            /* Fixed Width */
-      height: 210px;           /* Fixed Height */
-      border: 3px solid #0099cc;
-      background-color: #fdfbf7;
-      padding: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      z-index: 1000;
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 20px 240px 20px; /* Spacing for floating player */
+    }
+
+    .greeting-title {
+      font-size: 1.8rem;
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    /* Controls & Search Bar */
+    .toolbar-container {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      box-sizing: border-box;
+      gap: 15px;
+      margin-bottom: 25px;
     }
 
-    .player-details {
+    .filter-pills {
       display: flex;
-      align-items: center;
       gap: 10px;
-      width: 100%;
+      flex-wrap: wrap;
     }
 
-    .current-cover {
-      width: 50px;
-      height: 50px;
-      border-radius: 6px;
-      object-fit: cover;
-      flex-shrink: 0;
-      background-color: #ddd;
-    }
-
-    .song-name {
-      flex: 1;
-      min-width: 0; /* Enables text truncation inside flexbox */
+    .pill-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      background-color: #1e1e1e;
+      border: 1px solid #333333;
+      color: #ffffff;
       font-size: 14px;
       font-weight: bold;
-      color: #333;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .player audio {
-      width: 100%;
-      height: 36px;
-      margin: 5px 0;
-    }
-
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .controls .btn,
-    .controls #playerFavorite {
-      padding: 6px 12px;
-      font-size: 13px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      background: #ffffff;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
     }
 
-    .controls .btn:hover,
-    .controls #playerFavorite:hover {
-      background: #e0e0e0;
+    .pill-btn:hover {
+      background-color: #282828;
+      border-color: #1DB954;
     }
 
-    .footer {
-      grid-area: footer;
-      background-color: #0099cc;
-      color: #ffffff;
-      text-align: center;
-      padding: 30px;
-      margin-bottom: 230px; /* Adjusted spacing for fixed player */
-    }
-
-    @media (min-width: 600px) {
-      body {
-        padding-top: 85px;
-      }
-
-      .top-nav-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
-      }
-
-      .header {
-        background: transparent;
-      }
-
-      .header>h1 {
-        color: purple;
-        font-size: 24px;
-        margin: 0;
-      }
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    /* Search Bar Component */
     .search-container {
       display: flex;
       align-items: center;
       gap: 12px;
       width: 100%;
-      max-width: 500px;
-      font-family: system-ui, sans-serif;
     }
 
     .search-wrapper {
@@ -258,34 +152,32 @@
       left: 14px;
       width: 20px;
       height: 20px;
-      color: #9ca3af;
+      color: #888888;
       pointer-events: none;
     }
 
     .search {
       width: 100%;
       padding: 12px 16px 12px 44px;
-      font-size: 16px;
-      color: #1f2937;
-      background-color: #f3f4f6;
-      border: 2px solid transparent;
+      font-size: 15px;
+      color: #ffffff;
+      background-color: #1e1e1e;
+      border: 1px solid #333333;
       border-radius: 30px;
       outline: none;
-      transition: all 0.2s ease-in-out;
+      transition: border-color 0.2s ease-in-out;
     }
 
     .search:focus {
-      background-color: #ffffff;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      border-color: #1DB954;
     }
 
     .search-button {
       padding: 12px 24px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      color: #ffffff;
-      background-color: #3b82f6;
+      color: #000000;
+      background-color: #1DB954;
       border: none;
       border-radius: 30px;
       cursor: pointer;
@@ -293,13 +185,192 @@
     }
 
     .search-button:hover {
-      background-color: #2563eb;
+      background-color: #1ed760;
+    }
+
+    /* Song List Styles */
+    #song-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px 16px;
+      background-color: #1e1e1e;
+      border: 1px solid #282828;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .song-item:hover {
+      background-color: #252525;
+      border-color: #333333;
+    }
+
+    .song-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      background-color: #282828;
+      flex-shrink: 0;
+    }
+
+    .song-title {
+      font-weight: bold;
+      font-size: 15px;
+      color: #ffffff;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .favorite {
+      font-size: 20px;
+      padding: 5px;
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+
+    .favorite:hover {
+      transform: scale(1.2);
+    }
+
+    /* ==========================================
+       DARK FIXED FLOATING PLAYER WIDGET
+       ========================================== */
+    .player {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 340px;
+      background-color: #181818;
+      border: 1px solid #282828;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      border-radius: 16px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .player-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .current-cover {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: #282828;
+    }
+
+    .song-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player audio {
+      width: 100%;
+      height: 36px;
+      accent-color: #1DB954;
+      border-radius: 6px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .controls .btn,
+    .controls #playerFavorite {
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 20px;
+      border: 1px solid #333333;
+      background: #282828;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .controls .btn:hover,
+    .controls #playerFavorite:hover {
+      background: #1DB954;
+      color: #000000;
+      border-color: #1DB954;
+    }
+
+    .footer {
+      border-top: 1px solid #282828;
+      color: #888888;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 13px;
+      margin-top: 40px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 680px) {
+      body {
+        padding-top: 130px;
+      }
+
+      .top-nav-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+
+      .menu {
+        width: 100%;
+      }
+
+      .menu ul {
+        overflow-x: auto;
+        width: 100%;
+        padding-bottom: 4px;
+      }
+
+      .player {
+        left: 15px;
+        right: 15px;
+        width: auto;
+        bottom: 15px;
+      }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- FIXED TOP NAVIGATION BAR -->
   <div class="top-nav-wrapper">
     <div class="header">
       <h1>
@@ -309,18 +380,26 @@
       <span id="profile-name" style="display:none;"></span>
     </div>
 
-    <div class="menu">
+    <nav class="menu">
       <ul>
         <li onclick="loadSongs(); return false;">🏠 Home</li>
-        <li onclick="showFavorites(); return false;">❤️ Favorites</li>
-        <li onclick="showShuffle(); return false;">🔀 Shuffle</li>
+        <li onclick="window.location.href='/dash';">📊 Dashboard</li>
+        <li onclick="window.location.href='/manager';">🗑 Remove Songs</li>
         <li onclick="window.location.href='/default';">👤 Profile</li>
       </ul>
-    </div>
+    </nav>
   </div>
 
-  <div class="grid-container">
-    <div class="content">
+  <!-- MAIN CONTAINER -->
+  <div class="container">
+    <h2 id="greeting" class="greeting-title">Hello</h2>
+
+    <div class="toolbar-container">
+      <div class="filter-pills">
+        <button class="pill-btn" onclick="loadSongs();">🎵 All Tracks</button>
+        <button class="pill-btn" onclick="showFavorites();">❤️ Favorites</button>
+        <button class="pill-btn" onclick="showShuffle();">🔀 Shuffle</button>
+      </div>
 
       <form class="search-container" onsubmit="event.preventDefault(); filterSongs();">
         <div class="search-wrapper">
@@ -333,16 +412,16 @@
         </div>
         <button type="submit" class="search-button">Search</button>
       </form>
-
-      <ul id="song-list"></ul>
     </div>
 
+    <ul id="song-list"></ul>
+
     <div class="footer">
-      <p>&copy; 2026 Velora. All rights to Thanigaivel K.</p>
+      <p>&copy; 2026 Velora. All rights reserved.</p>
     </div>
   </div>
 
-  <!-- FIXED SIZE PLAYER CONTAINER -->
+  <!-- FLOATING PLAYER CONTAINER -->
   <div class="player">
     <div class="player-details">
       <img id="current-cover" class="current-cover" src="/static/images/default-cover.png" alt="Cover">
@@ -586,7 +665,7 @@
         listContainer.innerHTML = "";
         
         if (songList.length === 0) {
-          listContainer.innerHTML = `<li style="padding: 20px; text-align: center; color: #777;">No songs available.</li>`;
+          listContainer.innerHTML = `<li style="padding: 30px; text-align: center; color: #888888;">No songs found.</li>`;
           return;
         }
 
@@ -602,12 +681,13 @@
 
           const details = document.createElement("div");
           details.style.flex = "1";
+          details.style.minWidth = "0";
           details.innerHTML = `
                 <div class="song-title">
                     ${song.filename.split("|").slice(1).join(" ") || song.filename}
                 </div>
-                <div class="song-artist" style="color: #666; font-size: 14px;">
-                    ${song.youtube_id}
+                <div class="song-artist" style="color: #888888; font-size: 13px;">
+                    ID: ${song.youtube_id}
                 </div>
             `;
 

@@ -4,73 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>YouTube Downloader</title>
+    <title>Velora - YouTube Downloader</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/music.png">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            background: #121212;
+            color: #ffffff;
             margin: 0;
+            padding-top: 90px;
+            min-height: 100vh;
         }
 
-        header {
-            padding: 20px;
-            background: #181818;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-
-        /* Fixed Header & Menu Container at the Top */
+        /* ==========================================
+           FIXED TOP NAVIGATION MENU STYLES
+           ========================================== */
         .top-nav-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: white;
+            background-color: #181818;
+            border-bottom: 1px solid #282828;
             z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
         }
 
-        .header {
-            background-color: green;
-            text-align: center;
+        .header h1 {
+            margin: 0;
+            font-size: 1.3rem;
             color: #ffffff;
-        }
-
-        .header>h1 {
-            font-size: 30px;
-            margin: 10px 0;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
         }
 
-        .header>h1 img {
-            width: 32px;
-            height: 32px;
+        .header h1 img {
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
         .menu {
-            background-color: #ffffff;
-            padding: 5px 10px;
+            display: flex;
+            align-items: center;
         }
 
         .menu ul {
@@ -78,127 +64,246 @@
             margin: 0;
             padding: 0;
             display: flex;
-            gap: 5px;
-            overflow-x: auto;
+            gap: 8px;
             align-items: center;
         }
 
         .menu li {
-            padding: 6px 12px;
-            background-color: #33b5e5;
+            padding: 8px 16px;
+            background-color: #282828;
             color: #ffffff;
             white-space: nowrap;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
         }
 
         .menu li:hover {
-            background-color: #0099cc;
+            background-color: #1DB954;
+            color: #000000;
         }
 
-
+        /* ==========================================
+           MAIN CONTENT CONTAINER
+           ========================================== */
         .container {
-            max-width: 100%;
-            margin: 80px auto;
-            background: #fff;
-            padding: 150px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+            max-width: 680px;
+            margin: 30px auto;
+            padding: 0 20px 60px 20px;
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #282828;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            box-sizing: border-box;
+            padding: 14px;
+            font-size: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #282828;
+            color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #1DB954;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
         }
 
         button {
-            margin-top: 15px;
-            padding: 10px 20px;
+            flex: 1;
+            padding: 12px 20px;
             cursor: pointer;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s ease;
         }
 
+        .btn-primary {
+            background: #1DB954;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #1ed760;
+        }
+
+        .btn-secondary {
+            background: #282828;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+        }
+
+        /* Progress Bar */
         #progress {
             width: 100%;
-            height: 22px;
-            background: #ddd;
-            margin-top: 20px;
-            border-radius: 20px;
+            height: 14px;
+            background: #282828;
+            margin-top: 25px;
+            border-radius: 10px;
             overflow: hidden;
+            border: 1px solid #333;
         }
 
         #bar {
             width: 0%;
             height: 100%;
-            background: #4caf50;
-            transition: .25s;
+            background: #1DB954;
+            transition: width 0.25s ease;
         }
 
+        /* Preview Area */
         #playlistInfo {
-            margin-top: 20px;
+            margin-top: 25px;
+        }
+
+        #playlistInfo h3 {
+            margin: 10px 0 5px 0;
+        }
+
+        #playlistInfo p {
+            color: #aaa;
+            margin-top: 0;
+            font-size: 14px;
         }
 
         .thumb {
-            width: 160px;
-            border-radius: 6px;
+            width: 100%;
+            max-width: 240px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .video-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #282828;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .video-item img {
+            border-radius: 4px;
+            object-fit: cover;
         }
 
         #status {
             margin-top: 15px;
             font-weight: bold;
+            font-size: 15px;
         }
 
         #current {
             margin-top: 10px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* Responsive Layout Adjustments */
+        @media (max-width: 680px) {
+            body {
+                padding-top: 130px;
+            }
+
+            .top-nav-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .menu {
+                width: 100%;
+            }
+
+            .menu ul {
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 4px;
+            }
         }
     </style>
-
 </head>
 
 <body>
 
+    <!-- FIXED TOP NAVIGATION BAR -->
+    <div class="top-nav-wrapper">
+        <div class="header">
+            <h1>
+                <img id="profile-image" src="/static/images/icons8-download-100.png" alt="Velora Logo">
+                Velora
+            </h1>
+        </div>
+
+        <nav class="menu">
+            <ul>
+                <li onclick="window.location.href='/';">🏠 Home</li>
+                <li onclick="window.location.href='/dash';">📊 Dashboard</li>
+                <li onclick="window.location.href='/manager';">🗑 Remove Songs</li>
+                <li onclick="window.location.href='/default';">👤 Profile</li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- MAIN DOWNLOADER CONTAINER -->
     <div class="container">
+        <div class="card">
+            <h2>🎵 YouTube Downloader</h2>
+            <p class="subtitle">Paste a YouTube video or playlist URL below to download audio</p>
 
+            <input id="playlist" placeholder="Paste YouTube video or playlist URL...">
 
-
-
-        <div class="top-nav-wrapper">
-            <div class="header">
-                <h1>
-                    <img id="profile-image" src="/static/images/icons8-download-100.png" alt="Velora Logo">
-                    Velora Download Songs
-                </h1>
-                <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="preview()">Preview</button>
+                <button class="btn-primary" onclick="downloadPlaylist()">Download</button>
             </div>
 
-            <div class="menu">
-                <ul>
-                    <li onclick="window.location.href='/';">🏠 Home</li>
-                    <li onclick="window.location.href='/default';">👤 Profile</li>
+            <div id="playlistInfo"></div>
 
-                </ul>
+            <div id="progress">
+                <div id="bar"></div>
             </div>
+
+            <div id="current"></div>
+            <div id="status"></div>
         </div>
-
-        <h2>YouTube Downloader</h2>
-
-        <input id="playlist" placeholder="Paste YouTube video or playlist URL">
-
-        <br>
-
-        <button onclick="preview()">Preview</button>
-        <button onclick="downloadPlaylist()">Download</button>
-
-        <div id="playlistInfo"></div>
-
-        <div id="progress">
-            <div id="bar"></div>
-        </div>
-
-        <div id="current"></div>
-        <div id="status"></div>
-
     </div>
 
     <script>
@@ -206,6 +311,7 @@
             return localStorage.getItem("token");
         }
 
+        const token = getToken();
         if (!token) {
             alert("Please login first.");
             window.location.href = "/default";
@@ -216,7 +322,6 @@
         }
 
         async function preview() {
-
             const url = getUrl();
 
             if (!url) {
@@ -232,6 +337,7 @@
                     }
                 }
             );
+
             if (r.status === 401) {
                 localStorage.removeItem("token");
                 location.href = "/default";
@@ -243,35 +349,30 @@
                 document.getElementById("status").innerHTML = error;
                 return;
             }
+
             const data = await r.json();
 
             let html = `
-        <h3>${data.title}</h3>
-        <p>${data.count} item(s)</p>
-        <img class="thumb" src="${data.thumbnail}">
-    `;
-
-            if (data.videos) {
-
-                data.videos.forEach(v => {
-
-                    html += `
-            <div style="margin-top:10px">
-                <img src="${v.thumbnail}" width="90">
-                ${v.title}
-            </div>
+                <h3>${data.title}</h3>
+                <p>${data.count} item(s)</p>
+                <img class="thumb" src="${data.thumbnail}">
             `;
 
+            if (data.videos) {
+                data.videos.forEach(v => {
+                    html += `
+                    <div class="video-item">
+                        <img src="${v.thumbnail}" width="90" height="50">
+                        <span>${v.title}</span>
+                    </div>
+                    `;
                 });
-
             }
 
             document.getElementById("playlistInfo").innerHTML = html;
-
         }
 
         async function downloadPlaylist() {
-
             const url = getUrl();
 
             if (!url) {
@@ -302,69 +403,48 @@
             );
 
             ws.onmessage = (event) => {
-
                 const msg = JSON.parse(event.data);
 
                 if (msg.overall_percent !== undefined) {
-                    document.getElementById("bar").style.width =
-                        msg.overall_percent + "%";
+                    document.getElementById("bar").style.width = msg.overall_percent + "%";
                 }
 
                 if (msg.current !== undefined) {
-                    document.getElementById("current").innerHTML =
-                        `Video ${msg.current} / ${msg.total}`;
+                    document.getElementById("current").innerHTML = `Video ${msg.current} / ${msg.total}`;
                 }
 
                 // Already downloaded
                 if (msg.status === "exists") {
-
-                    document.getElementById("status").innerHTML =
-                        `✅ Already downloaded<br>${msg.title}`;
-
+                    document.getElementById("status").innerHTML = `✅ Already downloaded<br>${msg.title}`;
                     return;
                 }
 
                 // Downloading
                 if (msg.status === "downloading") {
-
-                    document.getElementById("status").innerHTML =
-                        `⬇ Downloading<br>${msg.title}`;
-
+                    document.getElementById("status").innerHTML = `⬇ Downloading<br>${msg.title}`;
                     return;
                 }
 
                 // Converting
                 if (msg.status === "converting") {
-
-                    document.getElementById("status").innerHTML =
-                        `🎵 Converting<br>${msg.title}`;
-
+                    document.getElementById("status").innerHTML = `🎵 Converting<br>${msg.title}`;
                     return;
                 }
 
                 // Completed
                 if (msg.status === "completed") {
-
                     document.getElementById("bar").style.width = "100%";
-
-                    document.getElementById("status").innerHTML =
-                        "✅ Download completed";
-
+                    document.getElementById("status").innerHTML = "✅ Download completed";
                     ws.close();
-
                     return;
                 }
 
                 // Error
                 if (msg.status === "error") {
-
-                    document.getElementById("status").innerHTML =
-                        "❌ " + msg.message;
-
+                    document.getElementById("status").innerHTML = "❌ " + msg.message;
                     ws.close();
-                };
+                }
             };
-
         }
     </script>
 

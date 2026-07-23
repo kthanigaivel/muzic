@@ -6,77 +6,60 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Velora admin dashboard for user, song, download, and play analytics.">
     <title>Velora Admin Dashboard</title>
     <link rel="icon" type="image/x-icon" href="/static/images/music.png">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #121212;
             color: #fff;
+            padding-top: 85px; /* Offset for fixed top navbar */
         }
 
-        header {
-            padding: 20px;
-            background: #181818;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-
-        /* Fixed Header & Menu Container at the Top */
+        /* ==========================================
+           FIXED TOP NAVIGATION MENU STYLES
+           ========================================== */
         .top-nav-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: white;
+            background-color: #181818;
+            border-bottom: 1px solid #282828;
             z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
         }
 
-        .header {
-            background-color: green;
-            text-align: center;
+        .header h1 {
+            margin: 0;
+            font-size: 1.3rem;
             color: #ffffff;
-        }
-
-        .header>h1 {
-            font-size: 30px;
-            margin: 10px 0;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
         }
 
-        .header>h1 img {
-            width: 32px;
-            height: 32px;
+        .header h1 img {
+            width: 30px;
+            height: 30px;
             object-fit: contain;
         }
 
         .menu {
-            background-color: #ffffff;
-            padding: 5px 10px;
+            display: flex;
+            align-items: center;
         }
 
         .menu ul {
@@ -84,49 +67,60 @@
             margin: 0;
             padding: 0;
             display: flex;
-            gap: 5px;
-            overflow-x: auto;
+            gap: 8px;
             align-items: center;
         }
 
         .menu li {
-            padding: 6px 12px;
-            background-color: #33b5e5;
+            padding: 8px 16px;
+            background-color: #282828;
             color: #ffffff;
             white-space: nowrap;
-            border-radius: 4px;
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
         }
 
         .menu li:hover {
-            background-color: #0099cc;
+            background-color: #1DB954;
+            color: #000000;
         }
 
-
+        /* ==========================================
+           DASHBOARD GRID & CONTENT
+           ========================================== */
         .container {
-            padding: 80px;
+            padding: 30px 24px 120px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px
+            gap: 15px;
         }
 
         .card {
             background: #1e1e1e;
             padding: 20px;
-            border-radius: 10px
+            border-radius: 10px;
+            border: 1px solid #282828;
         }
 
         .card h3 {
             margin: 0;
-            color: #aaa
+            color: #aaa;
+            font-size: 0.95rem;
         }
 
         .card h1 {
             color: #1DB954;
-            margin: 10px 0 0
+            margin: 10px 0 0;
+            font-size: 2rem;
         }
 
         table {
@@ -135,18 +129,21 @@
             background: #1e1e1e;
             margin: 20px 0;
             border-radius: 8px;
-            overflow: hidden
+            overflow: hidden;
+            border: 1px solid #282828;
         }
 
         th,
         td {
-            padding: 10px;
-            border-bottom: 1px solid #333;
-            text-align: left
+            padding: 12px;
+            border-bottom: 1px solid #282828;
+            text-align: left;
         }
 
         th {
-            background: #232323
+            background: #232323;
+            color: #aaa;
+            font-weight: 600;
         }
 
         img.cover {
@@ -154,55 +151,85 @@
             height: 42px;
             border-radius: 4px;
             vertical-align: middle;
-            margin-right: 8px
+            margin-right: 8px;
+            object-fit: cover;
         }
 
         .section {
-            margin-top: 25px
+            margin-top: 30px;
         }
 
-        .back {
-            display: inline-block;
-            padding: 10px 18px;
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        button {
+            padding: 6px 12px;
             background: #282828;
             color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-size: 14px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
             font-weight: bold;
-            transition: background .2s;
+            transition: background 0.2s;
         }
 
-        .back:hover {
+        button:hover {
             background: #1DB954;
+            color: #000;
+        }
+
+        /* Responsive Layout Adjustments */
+        @media (max-width: 680px) {
+            body {
+                padding-top: 130px;
+            }
+
+            .top-nav-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .menu {
+                width: 100%;
+            }
+
+            .menu ul {
+                overflow-x: auto;
+                width: 100%;
+                padding-bottom: 4px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <header>
 
-        <div class="top-nav-wrapper">
-            <div class="header">
-                <h1>
-                    <img id="profile-image" src="/static/images/music.png" alt="Velora Logo">
-                    📊 Velora Admin Dashboard
-                </h1>
-                <span id="profile-name" style="display:none;"></span> <!-- Hidden but kept for logic -->
-            </div>
-
-            <div class="menu">
-                <ul>
-                    <li onclick="window.location.href='/';">🏠 Home</li>
-                    <li onclick="loadDashboard(); return false;">🔄 Refresh</li>
-                    <li onclick="cleanupDownloads(); return false;">🧹 Clean Downloads</li>
-                    <li onclick="window.location.href='/default';">👤 Profile</li>
-
-                </ul>
-            </div>
+    <!-- FIXED TOP NAVIGATION BAR -->
+    <header class="top-nav-wrapper">
+        <div class="header">
+            <h1>
+                <img id="profile-image" src="/static/images/music.png" alt="Velora Logo">
+                📊 Velora Admin Dashboard
+            </h1>
+            <span id="profile-name" style="display:none;"></span>
         </div>
 
+        <nav class="menu">
+            <ul>
+                <li onclick="window.location.href='/';">🏠 Home</li>
+                <li onclick="loadDashboard(); return false;">🔄 Refresh</li>
+                <li onclick="cleanupDownloads(); return false;">🧹 Clean Downloads</li>
+                <li onclick="window.location.href='/default';">👤 Profile</li>
+            </ul>
+        </nav>
     </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
     <div class="container">
         <div class="grid">
             <div class="card">
@@ -232,13 +259,17 @@
             <h2>Recent Downloads</h2>
             <table id="downloadsTable"></table>
         </div>
+
         <div class="section">
             <h2>Recent Plays</h2>
             <table id="playsTable"></table>
         </div>
-
-
     </div>
+
+    <!-- AUDIO PLAYER -->
+    <audio id="dashboardPlayer" controls
+        style="width:100%; position:fixed; bottom:0; left:0; background:#181818; color:#fff; padding:8px; z-index:9999; border-top: 1px solid #282828;"></audio>
+
     <script>
         const token = localStorage.getItem("token");
         const usersEl = document.getElementById("users");
@@ -294,24 +325,19 @@
                         </tr>
                     `).join("");
 
-                topPlaysEl.innerHTML = "<tr><th>Song</th><th>Count</th></tr>" +
+                topPlaysEl.innerHTML = "<tr><th>Song</th><th>Count</th><th>Action</th></tr>" +
                     d.top_plays.map(x =>
                         `<tr>
-                    <td>${x.title}
-                    </td>
-                    <td>${x.count}
-                    <td>
-                        <button onclick="playSong('${x.youtube_id}')">▶ Play</button>
-           
-                    </td>
-                    </tr>`).join("");
+                            <td>${x.title}</td>
+                            <td>${x.count}</td>
+                            <td><button onclick="playSong('${x.youtube_id}')">▶ Play</button></td>
+                        </tr>`).join("");
             } catch (error) {
                 console.error("Dashboard load failed:", error);
             }
         }
 
         async function playSong(youtubeId) {
-            // Record play in backend (non-blocking for playback)
             try {
                 const response = await fetch(
                     `/songs/play?youtube_id=${encodeURIComponent(youtubeId)}`,
@@ -330,7 +356,6 @@
                 console.error("Record play error:", err);
             }
 
-            // Play inline on the dashboard
             try {
                 const dashPlayer = document.getElementById("dashboardPlayer");
                 if (!dashPlayer) {
@@ -381,8 +406,6 @@
             }
         }
     </script>
-    <audio id="dashboardPlayer" controls
-        style="width:100%;position:fixed;bottom:0;left:0;background:#181818;color:#fff;padding:8px;z-index:9999;"></audio>
 </body>
 
 </html>
